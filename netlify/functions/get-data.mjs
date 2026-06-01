@@ -1,14 +1,18 @@
 import { getStore } from "@netlify/blobs";
 
 export default async (req, context) => {
-  const store = getStore("painel-desafio");
+  const store = getStore({ name: "painel-desafio", consistency: "strong" });
 
-  const points = await store.get("points", { type: "json" }).catch(() => ({
-    jane: 0, lucas: 0, ana: 0, larissa: 0
-  }));
+  const getItem = async (key, fallback) => {
+    try {
+      const raw = await store.get(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch { return fallback; }
+  };
 
-  const pending = await store.get("pending", { type: "json" }).catch(() => []);
-  const validated = await store.get("validated", { type: "json" }).catch(() => 0);
+  const points = await getItem("points", { jane: 0, lucas: 0, ana: 0, larissa: 0 });
+  const pending = await getItem("pending", []);
+  const validated = await getItem("validated", 0);
 
   return Response.json({ points, pending, validated });
 };
