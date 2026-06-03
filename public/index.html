@@ -11,29 +11,19 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --gc-dark: #001636;
-      --gc-red: #CC0000;
-      --gc-blue: #0268CD;
-      --bg: #f4f6f9;
-      --surface: #ffffff;
-      --surface2: #f0f2f6;
-      --border: rgba(0,0,0,0.09);
-      --border-md: rgba(0,0,0,0.15);
-      --text: #0d1117;
-      --text-muted: #6b7280;
-      --text-faint: #9ca3af;
-      --radius: 10px;
-      --radius-lg: 14px;
+      --gc-dark: #001636; --gc-red: #CC0000; --gc-blue: #0268CD;
+      --bg: #f4f6f9; --surface: #ffffff; --surface2: #f0f2f6;
+      --border: rgba(0,0,0,0.09); --border-md: rgba(0,0,0,0.15);
+      --text: #0d1117; --text-muted: #6b7280; --text-faint: #9ca3af;
+      --radius: 10px; --radius-lg: 14px;
     }
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem 4rem; }
     .page-wrap { max-width: 720px; margin: 0 auto; }
-
     .header { background: var(--gc-dark); border-radius: var(--radius-lg); padding: 2rem 2rem 1.75rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; }
     .header::before { content: ''; position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: var(--gc-red); opacity: 0.07; border-radius: 50%; }
     .header-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--gc-red); color: #fff; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; }
     .header h1 { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700; color: #fff; line-height: 1.25; margin-bottom: 6px; }
     .header p { font-size: 13px; color: rgba(255,255,255,0.5); }
-
     .admin-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .admin-input-wrap { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 0.5px solid var(--border-md); border-radius: var(--radius); padding: 6px 12px; flex: 1; min-width: 180px; }
     .admin-input-wrap i { font-size: 16px; color: var(--text-faint); }
@@ -43,15 +33,12 @@
     .admin-status { font-size: 12px; padding: 5px 12px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
     .admin-status.ok { background: #EAF3DE; color: #27500A; }
     .admin-status.err { background: #FAECE7; color: #712B13; }
-
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
     .stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
     .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
     .stat-value { font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
     .stat-sub { font-size: 12px; color: var(--text-faint); margin-top: 2px; }
-
     .section-title { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-
     .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1.5rem; }
     .ranking-row { display: grid; grid-template-columns: 40px 1fr 120px 90px; align-items: center; padding: 14px 18px; border-bottom: 0.5px solid var(--border); gap: 12px; transition: background 0.15s; }
     .ranking-row:last-child { border-bottom: none; }
@@ -68,17 +55,13 @@
     .bar-wrap { display: flex; align-items: center; }
     .bar-bg { flex: 1; background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
-    .bar-jane { background: #378ADD; }
-    .bar-lucas { background: #639922; }
-    .bar-ana { background: #D85A30; }
-    .bar-larissa { background: #7F77DD; }
+    .bar-jane { background: #378ADD; } .bar-lucas { background: #639922; } .bar-ana { background: #D85A30; } .bar-larissa { background: #7F77DD; }
     .points-cell { text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
     .points-big { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
     .points-label { font-size: 11px; color: var(--text-faint); }
     .edit-pts-btn { background: none; border: 0.5px solid var(--border-md); border-radius: 6px; padding: 3px 6px; cursor: pointer; color: var(--text-muted); font-size: 14px; display: none; transition: background 0.15s; }
     .edit-pts-btn:hover { background: var(--surface2); }
     .admin-mode .edit-pts-btn { display: flex; align-items: center; }
-
     .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-bottom: 1.5rem; }
     .legend-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
     .legend-emoji { font-size: 20px; flex-shrink: 0; }
@@ -87,7 +70,6 @@
     .legend-pts-wrap { margin-left: auto; text-align: right; }
     .legend-pts-num { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--gc-dark); }
     .legend-pts-lbl { font-size: 10px; color: var(--text-faint); }
-
     .pending-list { display: flex; flex-direction: column; gap: 8px; }
     .pending-item { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 14px; }
     .pending-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; font-family: 'Outfit', sans-serif; }
@@ -103,13 +85,23 @@
     .empty-state { font-size: 13px; color: var(--text-faint); padding: 16px 0; text-align: center; }
     .add-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 16px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer; margin-bottom: 12px; font-family: 'Inter', sans-serif; transition: background 0.15s; }
     .add-btn:hover { background: var(--surface2); }
-
     .refresh-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 6px 12px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: var(--surface); color: var(--text-muted); cursor: pointer; margin-bottom: 12px; margin-left: 8px; font-family: 'Inter', sans-serif; transition: background 0.15s; }
     .refresh-btn:hover { background: var(--surface2); }
     .spinning { animation: spin 1s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
     .loading-overlay { display: flex; align-items: center; justify-content: center; padding: 2rem; color: var(--text-faint); font-size: 13px; gap: 8px; }
+
+    /* Histórico */
+    .history-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
+    .history-item { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 14px; }
+    .history-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; font-family: 'Outfit', sans-serif; }
+    .history-info { flex: 1; min-width: 0; }
+    .history-name { font-size: 13px; font-weight: 500; color: var(--text); }
+    .history-action { font-size: 11px; color: var(--text-muted); }
+    .history-pts { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; margin-right: 8px; }
+    .history-link { font-size: 11px; color: var(--gc-blue); text-decoration: none; white-space: nowrap; display: flex; align-items: center; gap: 3px; }
+    .history-link:hover { text-decoration: underline; }
+    .history-date { font-size: 11px; color: var(--text-faint); white-space: nowrap; }
 
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,10,30,0.45); align-items: center; justify-content: center; z-index: 200; }
     .modal-overlay.open { display: flex; }
@@ -124,7 +116,6 @@
     .btn-confirm:hover { background: #aa0000; }
     .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
     .link-hint { font-size: 11px; color: var(--text-faint); margin-top: -6px; margin-bottom: 10px; }
-
     .edit-player-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--border); }
     .edit-player-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; }
     .edit-current { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
@@ -133,10 +124,8 @@
     .edit-op-btn { padding: 10px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: var(--surface2); color: var(--text); font-size: 13px; cursor: pointer; font-family: 'Inter', sans-serif; text-align: center; transition: background 0.15s; }
     .edit-op-btn:hover { background: var(--border); }
     .edit-op-btn.selected { border-color: var(--gc-blue); background: #E6F1FB; color: #0C447C; }
-
     .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gc-dark); color: #fff; font-size: 13px; padding: 10px 20px; border-radius: 20px; opacity: 0; transition: opacity 0.3s; z-index: 999; pointer-events: none; }
     .toast.show { opacity: 1; }
-
     @media (max-width: 560px) {
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .ranking-row { grid-template-columns: 32px 1fr 80px; }
@@ -148,7 +137,6 @@
 </head>
 <body>
 <div class="page-wrap" id="pageWrap">
-
   <div class="header">
     <div class="header-badge"><i class="ti ti-bolt" style="font-size:12px"></i> Desafio ativo</div>
     <h1>Força da Base<br>Missão MRR Multipower</h1>
@@ -165,27 +153,13 @@
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">Total de pontos</div>
-      <div class="stat-value" id="statTotal">—</div>
-      <div class="stat-sub">no desafio</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Ações validadas</div>
-      <div class="stat-value" id="statActions">—</div>
-      <div class="stat-sub">confirmadas</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Líder atual</div>
-      <div class="stat-value" id="statLeader" style="font-size:18px; padding-top:4px">—</div>
-      <div class="stat-sub" id="statLeaderPts"></div>
-    </div>
+    <div class="stat-card"><div class="stat-label">Total de pontos</div><div class="stat-value" id="statTotal">—</div><div class="stat-sub">no desafio</div></div>
+    <div class="stat-card"><div class="stat-label">Ações validadas</div><div class="stat-value" id="statActions">—</div><div class="stat-sub">confirmadas</div></div>
+    <div class="stat-card"><div class="stat-label">Líder atual</div><div class="stat-value" id="statLeader" style="font-size:18px; padding-top:4px">—</div><div class="stat-sub" id="statLeaderPts"></div></div>
   </div>
 
   <div class="section-title">Ranking</div>
-  <div class="card" id="rankingCard">
-    <div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div>
-  </div>
+  <div class="card" id="rankingCard"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
 
   <div class="section-title">Tabela de pontos</div>
   <div class="legend-grid">
@@ -202,10 +176,10 @@
     <button class="add-btn" style="margin-bottom:0" onclick="openModal('modalOverlay')"><i class="ti ti-plus"></i> Registrar nova ação</button>
     <button class="refresh-btn" onclick="loadData(true)"><i class="ti ti-refresh" id="refreshIcon"></i> Atualizar</button>
   </div>
-  <div class="pending-list" id="pendingList">
-    <div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div>
-  </div>
+  <div class="pending-list" id="pendingList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
 
+  <div class="section-title" style="margin-top:1.5rem">Histórico de ações validadas</div>
+  <div class="history-list" id="historyList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
 </div>
 
 <!-- Modal registrar ação -->
@@ -262,20 +236,18 @@
 
 <script>
   const ADMIN_PASS = '2355';
-
   const playersMeta = {
     jane:    { name: 'Jane',        alias: 'camisa 10',   av: 'JA', cls: 'av-jane',    bar: 'bar-jane'    },
     lucas:   { name: 'Lucas Neiva', alias: 'Mineirinho',  av: 'LN', cls: 'av-lucas',   bar: 'bar-lucas'   },
     ana:     { name: 'Ana Luiza',   alias: 'Incendiária', av: 'AL', cls: 'av-ana',     bar: 'bar-ana'     },
     larissa: { name: 'Larissa',     alias: 'BOPE',        av: 'LA', cls: 'av-larissa', bar: 'bar-larissa' },
   };
-
   const actionLabels = {
     50: '⚡ Reativação', 30: '📈 Upgrade de plano', 25: '➕ Upsell add-on',
     20: '🛡️ Retenção (churn)', 18: '⏳ Renovação', 10: '📞 Atividade comercial',
   };
 
-  let state = { points: { jane:0, lucas:0, ana:0, larissa:0 }, pending: [], validated: 0 };
+  let state = { points: { jane:0, lucas:0, ana:0, larissa:0 }, pending: [], validated: 0, history: [] };
   let isAdmin = false;
   let editTarget = null;
   let editOp = 'add';
@@ -293,15 +265,11 @@
     if (showRefresh) icon.classList.add('spinning');
     try {
       const res = await fetch('/api/get-data');
-      if (!res.ok) throw new Error('Erro ao carregar dados');
+      if (!res.ok) throw new Error();
       state = await res.json();
-    } catch(e) {
-      console.error(e);
-    }
+    } catch(e) { console.error(e); }
     if (showRefresh) { icon.classList.remove('spinning'); showToast('Dados atualizados!'); }
-    renderRanking();
-    renderPending();
-    updateStats();
+    renderRanking(); renderPending(); renderHistory(); updateStats();
   }
 
   async function saveData(action, payload) {
@@ -322,8 +290,7 @@
       document.getElementById('pageWrap').classList.add('admin-mode');
       status.innerHTML = '<div class="admin-status ok"><i class="ti ti-shield-check"></i> Modo admin ativo</div>';
       document.getElementById('adminPwInput').value = '';
-      renderRanking();
-      renderPending();
+      renderRanking(); renderPending();
     } else {
       status.innerHTML = '<div class="admin-status err"><i class="ti ti-x"></i> Senha incorreta</div>';
       setTimeout(() => { if (status.querySelector('.err')) status.innerHTML = ''; }, 2000);
@@ -341,70 +308,69 @@
     const pts = state.points || {};
     const sorted = Object.entries(playersMeta).sort((a, b) => (pts[b[0]]||0) - (pts[a[0]]||0));
     const maxPts = Math.max(...Object.values(pts), 1);
-    const card = document.getElementById('rankingCard');
-    card.innerHTML = sorted.map(([key, p], i) => {
+    document.getElementById('rankingCard').innerHTML = sorted.map(([key, p], i) => {
       const barPct = Math.round(((pts[key]||0) / maxPts) * 100);
       return `<div class="ranking-row">
-        <div style="text-align:center">${rankIcon(i + 1)}</div>
+        <div style="text-align:center">${rankIcon(i+1)}</div>
         <div class="player-cell">
           <div class="avatar ${p.cls}">${p.av}</div>
-          <div>
-            <div class="player-name">${p.name}</div>
-            <div class="player-alias">${p.alias}</div>
-          </div>
+          <div><div class="player-name">${p.name}</div><div class="player-alias">${p.alias}</div></div>
         </div>
-        <div class="bar-wrap">
-          <div class="bar-bg"><div class="bar-fill ${p.bar}" style="width:${barPct}%"></div></div>
-        </div>
+        <div class="bar-wrap"><div class="bar-bg"><div class="bar-fill ${p.bar}" style="width:${barPct}%"></div></div></div>
         <div class="points-cell">
-          <div>
-            <div class="points-big">${pts[key]||0}</div>
-            <div class="points-label">pts</div>
-          </div>
-          <button class="edit-pts-btn" onclick="openEditModal('${key}')" title="Editar pontos">
-            <i class="ti ti-pencil"></i>
-          </button>
+          <div><div class="points-big">${pts[key]||0}</div><div class="points-label">pts</div></div>
+          <button class="edit-pts-btn" onclick="openEditModal('${key}')" title="Editar pontos"><i class="ti ti-pencil"></i></button>
         </div>
       </div>`;
     }).join('');
     const leader = sorted[0];
     document.getElementById('statLeader').textContent = leader[1].name.split(' ')[0];
-    const leaderPts = pts[leader[0]]||0;
-    document.getElementById('statLeaderPts').textContent = leaderPts > 0 ? `${leaderPts} pts` : 'empatados';
+    document.getElementById('statLeaderPts').textContent = (pts[leader[0]]||0) > 0 ? `${pts[leader[0]]} pts` : 'empatados';
   }
 
   function renderPending() {
     const pending = state.pending || [];
     const list = document.getElementById('pendingList');
-    if (pending.length === 0) {
-      list.innerHTML = '<div class="empty-state"><i class="ti ti-checks" style="font-size:24px; display:block; margin-bottom:6px"></i>Nenhuma ação pendente de validação.</div>';
-      return;
-    }
+    if (!pending.length) { list.innerHTML = '<div class="empty-state"><i class="ti ti-checks" style="font-size:24px; display:block; margin-bottom:6px"></i>Nenhuma ação pendente.</div>'; return; }
     list.innerHTML = pending.map(item => {
-      const p = playersMeta[item.playerKey];
-      if (!p) return '';
-      const linkHtml = item.link
-        ? `<a href="${item.link}" target="_blank" rel="noopener" style="font-size:11px; color:#0268CD; text-decoration:none; white-space:nowrap; margin-right:4px;"><i class="ti ti-external-link" style="font-size:12px"></i> ver link</a>`
-        : '';
+      const p = playersMeta[item.playerKey]; if (!p) return '';
+      const linkHtml = item.link ? `<a href="${item.link}" target="_blank" rel="noopener" style="font-size:11px; color:#0268CD; text-decoration:none; white-space:nowrap; margin-right:4px;"><i class="ti ti-external-link" style="font-size:12px"></i> ver link</a>` : '';
       return `<div class="pending-item" id="pend-${item.id}">
         <div class="pending-avatar ${p.cls}">${p.av}</div>
         <div class="pending-name">${p.name} <span class="pending-action">— ${actionLabels[item.pts]}</span></div>
         ${linkHtml}
         <span class="pending-pts">+${item.pts} pts</span>
-        <button class="validate-btn" onclick="validate('${item.id}','${item.playerKey}',${item.pts})">
-          <i class="ti ti-check"></i> Validar
-        </button>
-        <button class="delete-btn" onclick="deletePending('${item.id}')" title="Remover">
-          <i class="ti ti-trash"></i>
-        </button>
+        <button class="validate-btn" onclick="validate('${item.id}','${item.playerKey}',${item.pts})"><i class="ti ti-check"></i> Validar</button>
+        <button class="delete-btn" onclick="deletePending('${item.id}')" title="Remover"><i class="ti ti-trash"></i></button>
+      </div>`;
+    }).join('');
+  }
+
+  function renderHistory() {
+    const history = state.history || [];
+    const list = document.getElementById('historyList');
+    if (!history.length) { list.innerHTML = '<div class="empty-state">Nenhuma ação validada ainda.</div>'; return; }
+    list.innerHTML = history.map(item => {
+      const p = playersMeta[item.playerKey]; if (!p) return '';
+      const label = actionLabels[item.pts] || `${item.pts} pts`;
+      const date = item.validatedAt ? new Date(item.validatedAt).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '';
+      const linkHtml = item.link ? `<a href="${item.link}" target="_blank" rel="noopener" class="history-link"><i class="ti ti-external-link"></i> ver link</a>` : '<span style="font-size:11px; color:var(--text-faint)">sem link</span>';
+      return `<div class="history-item">
+        <div class="history-avatar ${p.cls}">${p.av}</div>
+        <div class="history-info">
+          <div class="history-name">${p.name}</div>
+          <div class="history-action">${label}</div>
+        </div>
+        ${linkHtml}
+        <span class="history-pts">+${item.pts} pts</span>
+        <span class="history-date">${date}</span>
       </div>`;
     }).join('');
   }
 
   function updateStats() {
     const pts = state.points || {};
-    const total = Object.values(pts).reduce((s, v) => s + v, 0);
-    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statTotal').textContent = Object.values(pts).reduce((s,v) => s+v, 0);
     document.getElementById('statActions').textContent = state.validated || 0;
   }
 
@@ -421,11 +387,8 @@
 
   async function deletePending(id) {
     if (!isAdmin) return;
-    try {
-      await saveData('delete-pending', { id });
-      showToast('Ação removida.');
-      await loadData();
-    } catch(e) { showToast('Erro ao remover.'); }
+    try { await saveData('delete-pending', { id }); showToast('Ação removida.'); await loadData(); }
+    catch(e) { showToast('Erro ao remover.'); }
   }
 
   function openModal(id) { document.getElementById(id).classList.add('open'); }
@@ -457,8 +420,7 @@
     const btn = document.getElementById('btnConfirmAction');
     btn.disabled = true; btn.textContent = 'Enviando...';
     try {
-      const item = { id: String(++idCounter), playerKey: pk, pts, link };
-      await saveData('add-pending', item);
+      await saveData('add-pending', { id: String(++idCounter), playerKey: pk, pts, link });
       closeModal('modalOverlay');
       showToast('Ação enviada! Aguarde validação.');
       await loadData();
@@ -468,24 +430,17 @@
   function openEditModal(playerKey) {
     if (!isAdmin) return;
     editTarget = playerKey;
-    editOp = 'add';
     const p = playersMeta[playerKey];
     const pts = (state.points||{})[playerKey]||0;
     document.getElementById('editCurrentPts').textContent = pts;
-    document.getElementById('editPlayerHeader').innerHTML = `
-      <div class="edit-player-avatar ${p.cls}">${p.av}</div>
-      <div>
-        <div style="font-size:15px; font-weight:500">${p.name}</div>
-        <div style="font-size:12px; color:var(--text-muted)">${p.alias}</div>
-      </div>`;
+    document.getElementById('editPlayerHeader').innerHTML = `<div class="edit-player-avatar ${p.cls}">${p.av}</div><div><div style="font-size:15px; font-weight:500">${p.name}</div><div style="font-size:12px; color:var(--text-muted)">${p.alias}</div></div>`;
     openModal('editModal');
   }
 
   function selectOp(op) {
     editOp = op;
     document.querySelectorAll('.edit-op-btn').forEach(b => b.classList.remove('selected'));
-    const map = { add: 'opAdd', remove: 'opRemove', set: 'opSet' };
-    document.getElementById(map[op]).classList.add('selected');
+    document.getElementById({ add:'opAdd', remove:'opRemove', set:'opSet' }[op]).classList.add('selected');
   }
 
   async function confirmEdit() {
@@ -505,7 +460,6 @@
   document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal('modalOverlay'); });
   document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeModal('editModal'); });
 
-  // Auto-refresh a cada 30s
   loadData();
   setInterval(() => loadData(), 30000);
 </script>
