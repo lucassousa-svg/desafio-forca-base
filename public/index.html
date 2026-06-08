@@ -39,6 +39,7 @@
     .stat-value { font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
     .stat-sub { font-size: 12px; color: var(--text-faint); margin-top: 2px; }
     .section-title { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1.5rem; }
     .ranking-row { display: grid; grid-template-columns: 40px 1fr 120px 90px; align-items: center; padding: 14px 18px; border-bottom: 0.5px solid var(--border); gap: 12px; transition: background 0.15s; }
     .ranking-row:last-child { border-bottom: none; }
@@ -87,11 +88,12 @@
     .add-btn:hover { background: var(--surface2); }
     .refresh-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 6px 12px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: var(--surface); color: var(--text-muted); cursor: pointer; margin-bottom: 12px; margin-left: 8px; font-family: 'Inter', sans-serif; transition: background 0.15s; }
     .refresh-btn:hover { background: var(--surface2); }
+    .close-week-btn { display: none; align-items: center; gap: 6px; font-size: 12px; padding: 6px 14px; border: 0.5px solid #CC0000; border-radius: var(--radius); background: transparent; color: #CC0000; cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s; }
+    .close-week-btn:hover { background: #FAECE7; }
+    .admin-mode .close-week-btn { display: flex; }
     .spinning { animation: spin 1s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .loading-overlay { display: flex; align-items: center; justify-content: center; padding: 2rem; color: var(--text-faint); font-size: 13px; gap: 8px; }
-
-    /* Histórico */
     .history-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
     .history-item { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 14px; }
     .history-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; font-family: 'Outfit', sans-serif; }
@@ -102,7 +104,17 @@
     .history-link { font-size: 11px; color: var(--gc-blue); text-decoration: none; white-space: nowrap; display: flex; align-items: center; gap: 3px; }
     .history-link:hover { text-decoration: underline; }
     .history-date { font-size: 11px; color: var(--text-faint); white-space: nowrap; }
-
+    .week-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 12px; overflow: hidden; }
+    .week-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
+    .week-header:hover { background: var(--surface2); }
+    .week-label { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); }
+    .week-meta { font-size: 12px; color: var(--text-muted); }
+    .week-body { padding: 12px 16px; display: none; }
+    .week-body.open { display: block; }
+    .week-ranking-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border); }
+    .week-ranking-row:last-child { border-bottom: none; }
+    .week-pos { font-family: 'Outfit', sans-serif; font-size: 16px; width: 28px; text-align: center; }
+    .week-pts { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; margin-left: auto; }
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,10,30,0.45); align-items: center; justify-content: center; z-index: 200; }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--surface); border: 0.5px solid var(--border-md); border-radius: var(--radius-lg); padding: 1.75rem; width: 400px; max-width: 92vw; box-shadow: 0 16px 48px rgba(0,0,0,0.18); }
@@ -115,6 +127,9 @@
     .btn-confirm { font-size: 13px; padding: 8px 18px; border: none; border-radius: var(--radius); background: var(--gc-red); color: #fff; cursor: pointer; font-weight: 600; font-family: 'Outfit', sans-serif; }
     .btn-confirm:hover { background: #aa0000; }
     .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-danger { font-size: 13px; padding: 8px 18px; border: none; border-radius: var(--radius); background: #CC0000; color: #fff; cursor: pointer; font-weight: 600; font-family: 'Outfit', sans-serif; }
+    .btn-danger:hover { background: #aa0000; }
+    .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
     .link-hint { font-size: 11px; color: var(--text-faint); margin-top: -6px; margin-bottom: 10px; }
     .edit-player-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 0.5px solid var(--border); }
     .edit-player-avatar { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; }
@@ -153,12 +168,15 @@
   </div>
 
   <div class="stats-grid">
-    <div class="stat-card"><div class="stat-label">Total de pontos</div><div class="stat-value" id="statTotal">—</div><div class="stat-sub">no desafio</div></div>
-    <div class="stat-card"><div class="stat-label">Ações validadas</div><div class="stat-value" id="statActions">—</div><div class="stat-sub">confirmadas</div></div>
+    <div class="stat-card"><div class="stat-label">Total de pontos</div><div class="stat-value" id="statTotal">—</div><div class="stat-sub">semana atual</div></div>
+    <div class="stat-card"><div class="stat-label">Ações validadas</div><div class="stat-value" id="statActions">—</div><div class="stat-sub">semana atual</div></div>
     <div class="stat-card"><div class="stat-label">Líder atual</div><div class="stat-value" id="statLeader" style="font-size:18px; padding-top:4px">—</div><div class="stat-sub" id="statLeaderPts"></div></div>
   </div>
 
-  <div class="section-title">Ranking</div>
+  <div class="section-header">
+    <div class="section-title" style="margin-bottom:0">Ranking — semana atual</div>
+    <button class="close-week-btn" onclick="openModal('weekModal')"><i class="ti ti-flag"></i> Encerrar semana</button>
+  </div>
   <div class="card" id="rankingCard"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
 
   <div class="section-title">Tabela de pontos</div>
@@ -178,8 +196,11 @@
   </div>
   <div class="pending-list" id="pendingList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
 
-  <div class="section-title" style="margin-top:1.5rem">Histórico de ações validadas</div>
+  <div class="section-title" style="margin-top:1.5rem">Histórico da semana atual</div>
   <div class="history-list" id="historyList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
+
+  <div class="section-title" style="margin-top:1.5rem">Semanas anteriores</div>
+  <div id="weeksList"><div class="empty-state">Nenhuma semana encerrada ainda.</div></div>
 </div>
 
 <!-- Modal registrar ação -->
@@ -208,6 +229,19 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('modalOverlay')">Cancelar</button>
       <button class="btn-confirm" id="btnConfirmAction" onclick="confirmAction()">Enviar para validação</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal encerrar semana -->
+<div class="modal-overlay" id="weekModal">
+  <div class="modal">
+    <h2>Encerrar semana</h2>
+    <p>O ranking atual será salvo no histórico e os pontos serão zerados para a próxima semana. Esta ação não pode ser desfeita.</p>
+    <input type="text" id="weekLabel" placeholder="Nome da semana (ex: Semana 1 — 02/06 a 06/06)" />
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('weekModal')">Cancelar</button>
+      <button class="btn-danger" id="btnConfirmWeek" onclick="confirmCloseWeek()"><i class="ti ti-flag"></i> Encerrar e zerar</button>
     </div>
   </div>
 </div>
@@ -247,7 +281,7 @@
     20: '🛡️ Retenção (churn)', 18: '⏳ Renovação', 10: '📞 Atividade comercial',
   };
 
-  let state = { points: { jane:0, lucas:0, ana:0, larissa:0 }, pending: [], validated: 0, history: [] };
+  let state = { points: {}, pending: [], validated: 0, history: [], weeks: [] };
   let isAdmin = false;
   let editTarget = null;
   let editOp = 'add';
@@ -269,13 +303,12 @@
       state = await res.json();
     } catch(e) { console.error(e); }
     if (showRefresh) { icon.classList.remove('spinning'); showToast('Dados atualizados!'); }
-    renderRanking(); renderPending(); renderHistory(); updateStats();
+    renderRanking(); renderPending(); renderHistory(); renderWeeks(); updateStats();
   }
 
   async function saveData(action, payload) {
     const res = await fetch('/api/save-data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, payload })
     });
     if (!res.ok) throw new Error('Erro ao salvar');
@@ -307,7 +340,7 @@
   function renderRanking() {
     const pts = state.points || {};
     const sorted = Object.entries(playersMeta).sort((a, b) => (pts[b[0]]||0) - (pts[a[0]]||0));
-    const maxPts = Math.max(...Object.values(pts), 1);
+    const maxPts = Math.max(...Object.values(pts).map(Number), 1);
     document.getElementById('rankingCard').innerHTML = sorted.map(([key, p], i) => {
       const barPct = Math.round(((pts[key]||0) / maxPts) * 100);
       return `<div class="ranking-row">
@@ -349,7 +382,7 @@
   function renderHistory() {
     const history = state.history || [];
     const list = document.getElementById('historyList');
-    if (!history.length) { list.innerHTML = '<div class="empty-state">Nenhuma ação validada ainda.</div>'; return; }
+    if (!history.length) { list.innerHTML = '<div class="empty-state">Nenhuma ação validada ainda nesta semana.</div>'; return; }
     list.innerHTML = history.map(item => {
       const p = playersMeta[item.playerKey]; if (!p) return '';
       const label = actionLabels[item.pts] || `${item.pts} pts`;
@@ -357,10 +390,7 @@
       const linkHtml = item.link ? `<a href="${item.link}" target="_blank" rel="noopener" class="history-link"><i class="ti ti-external-link"></i> ver link</a>` : '<span style="font-size:11px; color:var(--text-faint)">sem link</span>';
       return `<div class="history-item">
         <div class="history-avatar ${p.cls}">${p.av}</div>
-        <div class="history-info">
-          <div class="history-name">${p.name}</div>
-          <div class="history-action">${label}</div>
-        </div>
+        <div class="history-info"><div class="history-name">${p.name}</div><div class="history-action">${label}</div></div>
         ${linkHtml}
         <span class="history-pts">+${item.pts} pts</span>
         <span class="history-date">${date}</span>
@@ -368,9 +398,44 @@
     }).join('');
   }
 
+  function renderWeeks() {
+    const weeks = state.weeks || [];
+    const container = document.getElementById('weeksList');
+    if (!weeks.length) { container.innerHTML = '<div class="empty-state">Nenhuma semana encerrada ainda.</div>'; return; }
+    container.innerHTML = weeks.map((week, wi) => {
+      const pts = week.points || {};
+      const sorted = Object.entries(playersMeta).sort((a, b) => (pts[b[0]]||0) - (pts[a[0]]||0));
+      const date = week.closedAt ? new Date(week.closedAt).toLocaleDateString('pt-BR') : '';
+      const rows = sorted.map(([key, p], i) => `
+        <div class="week-ranking-row">
+          <span class="week-pos">${rankIcon(i+1)}</span>
+          <div class="avatar ${p.cls}" style="width:28px;height:28px;font-size:10px">${p.av}</div>
+          <div style="font-size:13px; font-weight:500">${p.name}</div>
+          <span class="week-pts">${pts[key]||0} pts</span>
+        </div>`).join('');
+      return `<div class="week-card">
+        <div class="week-header" onclick="toggleWeek(${wi})">
+          <div>
+            <div class="week-label">${week.label || 'Semana encerrada'}</div>
+            <div class="week-meta">${week.validated || 0} ações validadas · encerrada em ${date}</div>
+          </div>
+          <i class="ti ti-chevron-down" id="weekChevron${wi}"></i>
+        </div>
+        <div class="week-body" id="weekBody${wi}">${rows}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function toggleWeek(i) {
+    const body = document.getElementById(`weekBody${i}`);
+    const chevron = document.getElementById(`weekChevron${i}`);
+    body.classList.toggle('open');
+    chevron.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : '';
+  }
+
   function updateStats() {
     const pts = state.points || {};
-    document.getElementById('statTotal').textContent = Object.values(pts).reduce((s,v) => s+v, 0);
+    document.getElementById('statTotal').textContent = Object.values(pts).reduce((s,v) => s + Number(v), 0);
     document.getElementById('statActions').textContent = state.validated || 0;
   }
 
@@ -378,11 +443,8 @@
     if (!isAdmin) return;
     const btn = document.querySelector(`#pend-${id} .validate-btn`);
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader spinning"></i>'; }
-    try {
-      await saveData('validate', { id, playerKey, pts });
-      showToast('Ação validada!');
-      await loadData();
-    } catch(e) { showToast('Erro ao validar.'); }
+    try { await saveData('validate', { id, playerKey, pts }); showToast('Ação validada!'); await loadData(); }
+    catch(e) { showToast('Erro ao validar.'); }
   }
 
   async function deletePending(id) {
@@ -400,6 +462,11 @@
       document.getElementById('modalLink').value = '';
       document.getElementById('btnConfirmAction').disabled = false;
       document.getElementById('btnConfirmAction').textContent = 'Enviar para validação';
+    }
+    if (id === 'weekModal') {
+      document.getElementById('weekLabel').value = '';
+      document.getElementById('btnConfirmWeek').disabled = false;
+      document.getElementById('btnConfirmWeek').innerHTML = '<i class="ti ti-flag"></i> Encerrar e zerar';
     }
     if (id === 'editModal') {
       editTarget = null; editOp = 'add';
@@ -421,10 +488,20 @@
     btn.disabled = true; btn.textContent = 'Enviando...';
     try {
       await saveData('add-pending', { id: String(++idCounter), playerKey: pk, pts, link });
-      closeModal('modalOverlay');
-      showToast('Ação enviada! Aguarde validação.');
-      await loadData();
+      closeModal('modalOverlay'); showToast('Ação enviada! Aguarde validação.'); await loadData();
     } catch(e) { showToast('Erro ao enviar.'); btn.disabled = false; btn.textContent = 'Enviar para validação'; }
+  }
+
+  async function confirmCloseWeek() {
+    if (!isAdmin) return;
+    const label = document.getElementById('weekLabel').value.trim();
+    if (!label) { showToast('Digite o nome da semana.'); return; }
+    const btn = document.getElementById('btnConfirmWeek');
+    btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader spinning"></i> Encerrando...';
+    try {
+      await saveData('close-week', { label });
+      closeModal('weekModal'); showToast('Semana encerrada! Pontos zerados.'); await loadData();
+    } catch(e) { showToast('Erro ao encerrar semana.'); btn.disabled = false; btn.innerHTML = '<i class="ti ti-flag"></i> Encerrar e zerar'; }
   }
 
   function openEditModal(playerKey) {
@@ -451,14 +528,13 @@
     btn.disabled = true; btn.textContent = 'Salvando...';
     try {
       await saveData('edit-points', { playerKey: editTarget, op: editOp, value: val });
-      closeModal('editModal');
-      showToast('Pontos atualizados!');
-      await loadData();
+      closeModal('editModal'); showToast('Pontos atualizados!'); await loadData();
     } catch(e) { showToast('Erro ao salvar.'); btn.disabled = false; btn.textContent = 'Salvar'; }
   }
 
-  document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal('modalOverlay'); });
-  document.getElementById('editModal').addEventListener('click', function(e) { if (e.target === this) closeModal('editModal'); });
+  ['modalOverlay','weekModal','editModal'].forEach(id => {
+    document.getElementById(id).addEventListener('click', function(e) { if (e.target === this) closeModal(id); });
+  });
 
   loadData();
   setInterval(() => loadData(), 30000);
