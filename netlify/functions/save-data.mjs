@@ -7,7 +7,6 @@ export default async (req, context) => {
 
   const body = await req.json();
   const { action, payload } = body;
-
   const store = getStore({ name: "painel-desafio", consistency: "strong" });
 
   const getItem = async (key, fallback) => {
@@ -36,9 +35,7 @@ export default async (req, context) => {
     points[playerKey] = (points[playerKey] || 0) + Number(pts);
 
     history.unshift({
-      id,
-      playerKey,
-      pts: Number(pts),
+      id, playerKey, pts: Number(pts),
       link: item?.link || "",
       validatedAt: new Date().toISOString()
     });
@@ -47,7 +44,6 @@ export default async (req, context) => {
     await store.set("points", JSON.stringify(points));
     await store.set("validated", JSON.stringify(validated + 1));
     await store.set("history", JSON.stringify(history));
-
     return Response.json({ ok: true });
   }
 
@@ -64,8 +60,28 @@ export default async (req, context) => {
   if (action === "delete-pending") {
     const { id } = payload;
     const pending = await getItem("pending", []);
-    const newPending = pending.filter(p => p.id !== id);
-    await store.set("pending", JSON.stringify(newPending));
+    await store.set("pending", JSON.stringify(pending.filter(p => p.id !== id)));
+    return Response.json({ ok: true });
+  }
+
+  if (action === "close-week") {
+    const { label } = payload;
+    const points = await getItem("points", { jane: 0, lucas: 0, ana: 0, larissa: 0 });
+    const validated = await getItem("validated", 0);
+    const weeks = await getItem("weeks", []);
+
+    weeks.unshift({
+      label,
+      points: { ...points },
+      validated,
+      closedAt: new Date().toISOString()
+    });
+
+    await store.set("weeks", JSON.stringify(weeks));
+    await store.set("points", JSON.stringify({ jane: 0, lucas: 0, ana: 0, larissa: 0 }));
+    await store.set("validated", JSON.stringify(0));
+    await store.set("history", JSON.stringify([]));
+    await store.set("pending", JSON.stringify([]));
     return Response.json({ ok: true });
   }
 
