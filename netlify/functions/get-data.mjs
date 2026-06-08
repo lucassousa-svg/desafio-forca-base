@@ -14,8 +14,9 @@ export default async (req, context) => {
   const pending = await getItem("pending", []);
   const validated = await getItem("validated", 0);
   const history = await getItem("history", []);
+  const weeks = await getItem("weeks", []);
 
-  return Response.json({ points, pending, validated, history });
+  return Response.json({ points, pending, validated, history, weeks });
 };
 
 export const config = { path: "/api/get-data" };
