@@ -97,6 +97,11 @@
     .legend-pts-wrap { margin-left: auto; text-align: right; }
     .legend-pts-num { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--gc-dark); }
     .legend-pts-lbl { font-size: 10px; color: var(--text-faint); }
+    .legend-tier-1 { border-color: #CC0000; border-width: 1.5px; }
+    .legend-tier-1 .legend-pts-num { color: #CC0000; }
+    .legend-tier-2 { border-color: #E8720C; border-width: 1px; }
+    .legend-tier-2 .legend-pts-num { color: #E8720C; }
+    .legend-tier-3 .legend-pts-num { color: var(--gc-dark); }
 
     /* Pending */
     .pending-list { display: flex; flex-direction: column; gap: 8px; }
@@ -215,13 +220,15 @@
 
   <div class="section-title">Tabela de pontos</div>
   <div class="legend-grid">
-    <div class="legend-item"><span class="legend-emoji">⚡</span><div><div class="legend-name">Reativação</div><div class="legend-desc">30+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">50</div><div class="legend-pts-lbl">pts</div></div></div>
-    <div class="legend-item"><span class="legend-emoji">🔄</span><div><div class="legend-name">Recuperação</div><div class="legend-desc">50+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">60</div><div class="legend-pts-lbl">pts</div></div></div>
-    <div class="legend-item"><span class="legend-emoji">📈</span><div><div class="legend-name">Upgrade de plano</div><div class="legend-desc">Bronze → Prata etc.</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
-    <div class="legend-item"><span class="legend-emoji">⏫</span><div><div class="legend-name">Upgrade de duração</div><div class="legend-desc">Mensal → Anual</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
-    <div class="legend-item"><span class="legend-emoji">⭐</span><div><div class="legend-name">Avaliação no Google</div><div class="legend-desc">Por avaliação obtida</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">15</div><div class="legend-pts-lbl">pts</div></div></div>
-    <div class="legend-item"><span class="legend-emoji">➕</span><div><div class="legend-name">Upsell add-on</div><div class="legend-desc">Por cliente</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
-    <div class="legend-item"><span class="legend-emoji">🛡️</span><div><div class="legend-name">Retenção (churn)</div><div class="legend-desc">Cliente salvo</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item legend-tier-1"><span class="legend-emoji">🔄</span><div><div class="legend-name">Recuperação</div><div class="legend-desc">50+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">60</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item legend-tier-2"><span class="legend-emoji">⚡</span><div><div class="legend-name">Reativação</div><div class="legend-desc">30+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">50</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item legend-tier-2"><span class="legend-emoji">🤝</span><div><div class="legend-name">Indicação gerada</div><div class="legend-desc">Cliente indicou outro</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item legend-tier-2"><span class="legend-emoji">⏫</span><div><div class="legend-name">Upgrade de duração</div><div class="legend-desc">Mensal → Anual</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item legend-tier-3"><span class="legend-emoji">📈</span><div><div class="legend-name">Upgrade de plano</div><div class="legend-desc">Bronze → Prata etc.</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item legend-tier-3"><span class="legend-emoji">➕</span><div><div class="legend-name">Upsell add-on</div><div class="legend-desc">Por cliente</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item legend-tier-3"><span class="legend-emoji">🛡️</span><div><div class="legend-name">Retenção (churn)</div><div class="legend-desc">Cliente salvo</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item legend-tier-3"><span class="legend-emoji">⭐</span><div><div class="legend-name">Avaliação no Google</div><div class="legend-desc">Por avaliação obtida</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">15</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item legend-tier-3"><span class="legend-emoji">📅</span><div><div class="legend-name">Antecipação de renovação</div><div class="legend-desc">Renovou antes do vencimento</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">10</div><div class="legend-pts-lbl">pts</div></div></div>
   </div>
 
   <div class="section-title">Ações pendentes de validação</div>
@@ -263,6 +270,8 @@
       <option value="15">⭐ Avaliação no Google — 15 pts</option>
       <option value="30u">➕ Upsell add-on — 30 pts</option>
       <option value="30r">🛡️ Retenção (churn) — 30 pts</option>
+      <option value="40i">🤝 Indicação gerada — 40 pts</option>
+      <option value="10a">📅 Antecipação de renovação — 10 pts</option>
     </select>
     <input type="text" id="modalLink" placeholder="Link da intranet (obrigatório)" />
     <div class="link-hint">Cole o link da intranet para que o administrador possa validar.</div>
@@ -326,6 +335,8 @@
     '15':  '⭐ Avaliação no Google',
     '30u': '➕ Upsell add-on',
     '30r': '🛡️ Retenção (churn)',
+    '40i': '🤝 Indicação gerada',
+    '10a': '📅 Antecipação de renovação',
   };
 
   // Títulos dinâmicos por tipo de ação mais frequente
@@ -334,9 +345,11 @@
     '60':  '🔄 Mestre da Ressurreição',
     '30':  '📈 Sobe Patente',
     '40':  '⏫ Fidelizador(a)',
+    '40i': '🤝 Embaixador(a)',
     '15':  '⭐ 5 Estrelas',
     '30u': '➕ Rei/Rainha dos Upsells',
     '30r': '🛡️ Muralha',
+    '10a': '📅 Antecipador(a)',
   };
 
   function getLabel(pts) { return actionLabels[String(pts)] || `+${parseInt(pts)||0} pts`; }
