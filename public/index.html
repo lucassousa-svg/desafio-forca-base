@@ -215,6 +215,7 @@
   <div class="section-header">
     <div class="section-title" style="margin-bottom:0">Ranking — semana atual</div>
     <button class="close-week-btn" onclick="openModal('weekModal')"><i class="ti ti-flag"></i> Encerrar semana</button>
+    <button class="close-week-btn" style="border-color:#6b7280; color:#6b7280; margin-left:6px;" onclick="openModal('zeroDayModal')"><i class="ti ti-trash"></i> Zerar hoje</button>
   </div>
   <div class="card" id="rankingCard"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
 
@@ -278,6 +279,18 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('modalOverlay')">Cancelar</button>
       <button class="btn-confirm" id="btnConfirmAction" onclick="confirmAction()">Enviar para validação</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal zerar hoje -->
+<div class="modal-overlay" id="zeroDayModal">
+  <div class="modal">
+    <h2>Zerar registros de hoje</h2>
+    <p>Remove do histórico e estorna dos pontos todas as ações validadas hoje. Os demais dias da semana não são afetados. Esta ação não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('zeroDayModal')">Cancelar</button>
+      <button class="btn-danger" id="btnConfirmZeroDay" onclick="confirmZeroDay()"><i class="ti ti-trash"></i> Zerar hoje</button>
     </div>
   </div>
 </div>
@@ -352,8 +365,13 @@
     '10a': '📅 Antecipador(a)',
   };
 
-  function getLabel(pts) { return actionLabels[String(pts)] || `+${parseInt(pts)||0} pts`; }
-  function getPoints(v) { return parseInt(v) || 0; }
+  function getLabel(pts) { return actionLabels[String(pts)] || `+${ptsMap[String(pts)]||parseInt(pts)||0} pts`; }
+
+  const ptsMap = {
+    '50': 50, '60': 60, '30': 30, '40': 40, '15': 15,
+    '30u': 30, '30r': 30, '40i': 40, '10a': 10,
+  };
+  function getPoints(v) { return ptsMap[String(v)] ?? parseInt(v) ?? 0; }
 
   let state = { points: {}, pending: [], validated: 0, history: [], weeks: [] };
   let prevRanking = [];
@@ -570,6 +588,7 @@
   function closeModal(id) {
     document.getElementById(id).classList.remove('open');
     if (id === 'modalOverlay') { document.getElementById('modalPlayer').value=''; document.getElementById('modalAction').value=''; document.getElementById('modalLink').value=''; document.getElementById('btnConfirmAction').disabled=false; document.getElementById('btnConfirmAction').textContent='Enviar para validação'; }
+    if (id === 'zeroDayModal') { document.getElementById('btnConfirmZeroDay').disabled=false; document.getElementById('btnConfirmZeroDay').innerHTML='<i class="ti ti-trash"></i> Zerar hoje'; }
     if (id === 'weekModal') { document.getElementById('weekLabel').value=''; document.getElementById('btnConfirmWeek').disabled=false; document.getElementById('btnConfirmWeek').innerHTML='<i class="ti ti-flag"></i> Encerrar e zerar'; }
     if (id === 'editModal') { editTarget=null; editOp='add'; document.getElementById('editPtsValue').value=''; document.querySelectorAll('.edit-op-btn').forEach(b=>b.classList.remove('selected')); document.getElementById('opAdd').classList.add('selected'); document.getElementById('btnConfirmEdit').disabled=false; document.getElementById('btnConfirmEdit').textContent='Salvar'; }
   }
@@ -584,6 +603,14 @@
     btn.disabled=true; btn.textContent='Enviando...';
     try { await saveData('add-pending', { id: String(++idCounter), playerKey:pk, pts, link }); closeModal('modalOverlay'); showToast('Ação enviada! Aguarde validação.'); await loadData(); }
     catch(e) { showToast('Erro ao enviar.'); btn.disabled=false; btn.textContent='Enviar para validação'; }
+  }
+
+  async function confirmZeroDay() {
+    if (!isAdmin) return;
+    const btn = document.getElementById('btnConfirmZeroDay');
+    btn.disabled=true; btn.innerHTML='<i class="ti ti-loader spinning"></i> Zerando...';
+    try { await saveData('zero-today', {}); closeModal('zeroDayModal'); showToast('Registros de hoje removidos!'); await loadData(); }
+    catch(e) { showToast('Erro ao zerar.'); btn.disabled=false; btn.innerHTML='<i class="ti ti-trash"></i> Zerar hoje'; }
   }
 
   async function confirmCloseWeek() {
@@ -622,7 +649,7 @@
     catch(e) { showToast('Erro ao salvar.'); btn.disabled=false; btn.textContent='Salvar'; }
   }
 
-  ['modalOverlay','weekModal','editModal'].forEach(id => {
+  ['modalOverlay','weekModal','zeroDayModal','editModal'].forEach(id => {
     document.getElementById(id).addEventListener('click', function(e) { if (e.target===this) closeModal(id); });
   });
 
