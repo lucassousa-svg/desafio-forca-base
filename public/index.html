@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Desafio Força da Base — GestãoClick</title>
+  <title>Operação Base Forte — GestãoClick</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
@@ -19,11 +20,15 @@
     }
     body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem 4rem; }
     .page-wrap { max-width: 720px; margin: 0 auto; }
+
+    /* Header */
     .header { background: var(--gc-dark); border-radius: var(--radius-lg); padding: 2rem 2rem 1.75rem; margin-bottom: 1.5rem; position: relative; overflow: hidden; }
     .header::before { content: ''; position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: var(--gc-red); opacity: 0.07; border-radius: 50%; }
     .header-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--gc-red); color: #fff; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; }
     .header h1 { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700; color: #fff; line-height: 1.25; margin-bottom: 6px; }
     .header p { font-size: 13px; color: rgba(255,255,255,0.5); }
+
+    /* Admin */
     .admin-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .admin-input-wrap { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 0.5px solid var(--border-md); border-radius: var(--radius); padding: 6px 12px; flex: 1; min-width: 180px; }
     .admin-input-wrap i { font-size: 16px; color: var(--text-faint); }
@@ -33,17 +38,30 @@
     .admin-status { font-size: 12px; padding: 5px 12px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
     .admin-status.ok { background: #EAF3DE; color: #27500A; }
     .admin-status.err { background: #FAECE7; color: #712B13; }
+
+    /* Stats */
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
     .stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
     .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
     .stat-value { font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
     .stat-sub { font-size: 12px; color: var(--text-faint); margin-top: 2px; }
+
+    /* Section */
     .section-title { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+
+    /* Ranking */
     .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1.5rem; }
-    .ranking-row { display: grid; grid-template-columns: 40px 1fr 120px 90px; align-items: center; padding: 14px 18px; border-bottom: 0.5px solid var(--border); gap: 12px; transition: background 0.15s; }
+    .ranking-row { display: grid; grid-template-columns: 40px 1fr 110px 90px; align-items: center; padding: 12px 18px; border-bottom: 0.5px solid var(--border); gap: 12px; transition: background 0.15s; position: relative; }
     .ranking-row:last-child { border-bottom: none; }
     .ranking-row:hover { background: var(--surface2); }
+    .ranking-row.overtake { animation: overtakePulse 1.2s ease; }
+    @keyframes overtakePulse {
+      0% { background: #fff; }
+      20% { background: #FFF3CD; transform: scale(1.01); }
+      60% { background: #FFF9E6; }
+      100% { background: #fff; transform: scale(1); }
+    }
     .rank-n { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; color: var(--text-faint); text-align: center; }
     .player-cell { display: flex; align-items: center; gap: 10px; }
     .avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; flex-shrink: 0; }
@@ -54,6 +72,7 @@
     .av-arthur { background: #FEF0E6; color: #93340A; }
     .player-name { font-size: 14px; font-weight: 500; color: var(--text); }
     .player-alias { font-size: 11px; color: var(--text-muted); background: var(--surface2); padding: 2px 8px; border-radius: 10px; display: inline-block; margin-top: 2px; }
+    .player-title { font-size: 11px; color: var(--gc-red); font-weight: 500; margin-top: 2px; display: block; }
     .bar-wrap { display: flex; align-items: center; }
     .bar-bg { flex: 1; background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
@@ -64,6 +83,12 @@
     .edit-pts-btn { background: none; border: 0.5px solid var(--border-md); border-radius: 6px; padding: 3px 6px; cursor: pointer; color: var(--text-muted); font-size: 14px; display: none; transition: background 0.15s; }
     .edit-pts-btn:hover { background: var(--surface2); }
     .admin-mode .edit-pts-btn { display: flex; align-items: center; }
+
+    /* Overtake notification */
+    .overtake-toast { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: #fff; font-size: 13px; padding: 10px 20px; border-radius: 20px; opacity: 0; transition: opacity 0.4s; z-index: 1000; pointer-events: none; display: flex; align-items: center; gap: 8px; white-space: nowrap; box-shadow: 0 4px 24px rgba(0,0,0,0.25); }
+    .overtake-toast.show { opacity: 1; }
+
+    /* Legend */
     .legend-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-bottom: 1.5rem; }
     .legend-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
     .legend-emoji { font-size: 20px; flex-shrink: 0; }
@@ -72,6 +97,8 @@
     .legend-pts-wrap { margin-left: auto; text-align: right; }
     .legend-pts-num { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--gc-dark); }
     .legend-pts-lbl { font-size: 10px; color: var(--text-faint); }
+
+    /* Pending */
     .pending-list { display: flex; flex-direction: column; gap: 8px; }
     .pending-item { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 14px; }
     .pending-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; font-family: 'Outfit', sans-serif; }
@@ -95,6 +122,8 @@
     .spinning { animation: spin 1s linear infinite; }
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .loading-overlay { display: flex; align-items: center; justify-content: center; padding: 2rem; color: var(--text-faint); font-size: 13px; gap: 8px; }
+
+    /* History */
     .history-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
     .history-item { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 14px; }
     .history-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; font-family: 'Outfit', sans-serif; }
@@ -105,6 +134,8 @@
     .history-link { font-size: 11px; color: var(--gc-blue); text-decoration: none; white-space: nowrap; display: flex; align-items: center; gap: 3px; }
     .history-link:hover { text-decoration: underline; }
     .history-date { font-size: 11px; color: var(--text-faint); white-space: nowrap; }
+
+    /* Weeks */
     .week-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 12px; overflow: hidden; }
     .week-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
     .week-header:hover { background: var(--surface2); }
@@ -116,6 +147,8 @@
     .week-ranking-row:last-child { border-bottom: none; }
     .week-pos { font-family: 'Outfit', sans-serif; font-size: 16px; width: 28px; text-align: center; }
     .week-pts { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; margin-left: auto; }
+
+    /* Modals */
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,10,30,0.45); align-items: center; justify-content: center; z-index: 200; }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--surface); border: 0.5px solid var(--border-md); border-radius: var(--radius-lg); padding: 1.75rem; width: 400px; max-width: 92vw; box-shadow: 0 16px 48px rgba(0,0,0,0.18); }
@@ -155,9 +188,10 @@
 <div class="page-wrap" id="pageWrap">
   <div class="header">
     <div class="header-badge"><i class="ti ti-bolt" style="font-size:12px"></i> Desafio ativo</div>
-    <h1>Força da Base<br>Missão MRR Multipower</h1>
+    <h1>Força da Base<br>Operação Base Forte</h1>
     <p>Ranking atualizado em tempo real · Poste sua ação e aguarde validação</p>
   </div>
+
   <div class="admin-bar">
     <div class="admin-input-wrap">
       <i class="ti ti-lock"></i>
@@ -166,16 +200,19 @@
     <button class="admin-btn" onclick="tryAdmin()"><i class="ti ti-shield-check"></i> Entrar</button>
     <div id="adminStatus"></div>
   </div>
+
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-label">Total de pontos</div><div class="stat-value" id="statTotal">—</div><div class="stat-sub">semana atual</div></div>
     <div class="stat-card"><div class="stat-label">Ações validadas</div><div class="stat-value" id="statActions">—</div><div class="stat-sub">semana atual</div></div>
     <div class="stat-card"><div class="stat-label">Líder atual</div><div class="stat-value" id="statLeader" style="font-size:18px; padding-top:4px">—</div><div class="stat-sub" id="statLeaderPts"></div></div>
   </div>
+
   <div class="section-header">
     <div class="section-title" style="margin-bottom:0">Ranking — semana atual</div>
     <button class="close-week-btn" onclick="openModal('weekModal')"><i class="ti ti-flag"></i> Encerrar semana</button>
   </div>
   <div class="card" id="rankingCard"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
+
   <div class="section-title">Tabela de pontos</div>
   <div class="legend-grid">
     <div class="legend-item"><span class="legend-emoji">⚡</span><div><div class="legend-name">Reativação</div><div class="legend-desc">30+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">50</div><div class="legend-pts-lbl">pts</div></div></div>
@@ -186,18 +223,25 @@
     <div class="legend-item"><span class="legend-emoji">➕</span><div><div class="legend-name">Upsell add-on</div><div class="legend-desc">Por cliente</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
     <div class="legend-item"><span class="legend-emoji">🛡️</span><div><div class="legend-name">Retenção (churn)</div><div class="legend-desc">Cliente salvo</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
   </div>
+
   <div class="section-title">Ações pendentes de validação</div>
   <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-bottom:12px;">
     <button class="add-btn" style="margin-bottom:0" onclick="openModal('modalOverlay')"><i class="ti ti-plus"></i> Registrar nova ação</button>
     <button class="refresh-btn" onclick="loadData(true)"><i class="ti ti-refresh" id="refreshIcon"></i> Atualizar</button>
   </div>
   <div class="pending-list" id="pendingList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
+
   <div class="section-title" style="margin-top:1.5rem">Histórico da semana atual</div>
   <div class="history-list" id="historyList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
+
   <div class="section-title" style="margin-top:1.5rem">Semanas anteriores</div>
   <div id="weeksList"><div class="empty-state">Nenhuma semana encerrada ainda.</div></div>
 </div>
 
+<!-- Overtake notification -->
+<div class="overtake-toast" id="overtakeToast"></div>
+
+<!-- Modal registrar ação -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2>Registrar ação</h2>
@@ -229,6 +273,7 @@
   </div>
 </div>
 
+<!-- Modal encerrar semana -->
 <div class="modal-overlay" id="weekModal">
   <div class="modal">
     <h2>Encerrar semana</h2>
@@ -241,6 +286,7 @@
   </div>
 </div>
 
+<!-- Modal editar pontos -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <h2>Editar pontos</h2>
@@ -271,6 +317,7 @@
     larissa: { name: 'Larissa',     alias: 'BOPE',        av: 'LA', cls: 'av-larissa', bar: 'bar-larissa' },
     arthur:  { name: 'Arthur',      alias: 'Aspira',      av: 'AR', cls: 'av-arthur',  bar: 'bar-arthur'  },
   };
+
   const actionLabels = {
     '50':  '⚡ Reativação (30+ dias)',
     '60':  '🔄 Recuperação (50+ dias)',
@@ -281,11 +328,24 @@
     '30r': '🛡️ Retenção (churn)',
   };
 
+  // Títulos dinâmicos por tipo de ação mais frequente
+  const titleMap = {
+    '50':  '⚡ Caçador(a) de Inativos',
+    '60':  '🔄 Mestre da Ressurreição',
+    '30':  '📈 Sobe Patente',
+    '40':  '⏫ Fidelizador(a)',
+    '15':  '⭐ 5 Estrelas',
+    '30u': '➕ Rei/Rainha dos Upsells',
+    '30r': '🛡️ Muralha',
+  };
+
   function getLabel(pts) { return actionLabels[String(pts)] || `+${parseInt(pts)||0} pts`; }
-  function getPoints(pts) { return parseInt(pts) || 0; }
+  function getPoints(v) { return parseInt(v) || 0; }
 
   let state = { points: {}, pending: [], validated: 0, history: [], weeks: [] };
+  let prevRanking = [];
   let isAdmin = false, editTarget = null, editOp = 'add', idCounter = Date.now();
+  let firstLoad = true;
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -293,17 +353,61 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
+  function showOvertake(msg) {
+    const t = document.getElementById('overtakeToast');
+    t.innerHTML = '🔺 ' + msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  // Calcula título dinâmico baseado no histórico da semana
+  function calcTitle(playerKey, history) {
+    const counts = {};
+    (history || []).filter(h => h.playerKey === playerKey).forEach(h => {
+      const k = String(h.pts);
+      counts[k] = (counts[k] || 0) + 1;
+    });
+    if (!Object.keys(counts).length) return null;
+    const top = Object.entries(counts).sort((a,b) => b[1]-a[1])[0][0];
+    return titleMap[top] || null;
+  }
+
+  // Detecta ultrapassagens comparando ranking anterior com novo
+  function detectOvertakes(newSorted) {
+    if (firstLoad || !prevRanking.length) return;
+    newSorted.forEach(([key, p], newPos) => {
+      const oldPos = prevRanking.indexOf(key);
+      if (oldPos > newPos && oldPos !== -1) {
+        const displaced = prevRanking[newPos];
+        const displacedName = playersMeta[displaced]?.name || displaced;
+        showOvertake(`${p.name} ultrapassou ${displacedName}! 🔥`);
+      }
+    });
+  }
+
   async function loadData(showRefresh = false) {
     const icon = document.getElementById('refreshIcon');
     if (showRefresh) icon.classList.add('spinning');
-    try { const res = await fetch('/api/get-data'); if (!res.ok) throw new Error(); state = await res.json(); }
-    catch(e) { console.error(e); }
+    try {
+      const res = await fetch('/api/get-data');
+      if (!res.ok) throw new Error();
+      const newState = await res.json();
+      const pts = newState.points || {};
+      const newSorted = Object.entries(playersMeta).sort((a,b) => (pts[b[0]]||0)-(pts[a[0]]||0));
+      detectOvertakes(newSorted);
+      prevRanking = newSorted.map(([k]) => k);
+      state = newState;
+    } catch(e) { console.error(e); }
     if (showRefresh) { icon.classList.remove('spinning'); showToast('Dados atualizados!'); }
     renderRanking(); renderPending(); renderHistory(); renderWeeks(); updateStats();
+    firstLoad = false;
   }
 
   async function saveData(action, payload) {
-    const res = await fetch('/api/save-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, payload }) });
+    const res = await fetch('/api/save-data', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, payload })
+    });
     if (!res.ok) throw new Error('Erro ao salvar');
     return res.json();
   }
@@ -332,16 +436,28 @@
 
   function renderRanking() {
     const pts = state.points || {};
-    const sorted = Object.entries(playersMeta).sort((a, b) => (pts[b[0]]||0) - (pts[a[0]]||0));
+    const history = state.history || [];
+    const sorted = Object.entries(playersMeta).sort((a,b) => (pts[b[0]]||0)-(pts[a[0]]||0));
     const maxPts = Math.max(...Object.values(pts).map(Number), 1);
     document.getElementById('rankingCard').innerHTML = sorted.map(([key, p], i) => {
-      const barPct = Math.round(((pts[key]||0) / maxPts) * 100);
-      return `<div class="ranking-row">
+      const barPct = Math.round(((pts[key]||0)/maxPts)*100);
+      const title = calcTitle(key, history);
+      const titleHtml = title ? `<span class="player-title">${title}</span>` : '';
+      return `<div class="ranking-row" id="row-${key}">
         <div style="text-align:center">${rankIcon(i+1)}</div>
-        <div class="player-cell"><div class="avatar ${p.cls}">${p.av}</div><div><div class="player-name">${p.name}</div><div class="player-alias">${p.alias}</div></div></div>
+        <div class="player-cell">
+          <div class="avatar ${p.cls}">${p.av}</div>
+          <div>
+            <div class="player-name">${p.name}</div>
+            <div class="player-alias">${p.alias}</div>
+            ${titleHtml}
+          </div>
+        </div>
         <div class="bar-wrap"><div class="bar-bg"><div class="bar-fill ${p.bar}" style="width:${barPct}%"></div></div></div>
-        <div class="points-cell"><div><div class="points-big">${pts[key]||0}</div><div class="points-label">pts</div></div>
-          <button class="edit-pts-btn" onclick="openEditModal('${key}')"><i class="ti ti-pencil"></i></button></div>
+        <div class="points-cell">
+          <div><div class="points-big">${pts[key]||0}</div><div class="points-label">pts</div></div>
+          <button class="edit-pts-btn" onclick="openEditModal('${key}')"><i class="ti ti-pencil"></i></button>
+        </div>
       </div>`;
     }).join('');
     const leader = sorted[0];
@@ -391,7 +507,7 @@
     if (!weeks.length) { container.innerHTML = '<div class="empty-state">Nenhuma semana encerrada ainda.</div>'; return; }
     container.innerHTML = weeks.map((week, wi) => {
       const pts = week.points || {};
-      const sorted = Object.entries(playersMeta).sort((a, b) => (pts[b[0]]||0) - (pts[a[0]]||0));
+      const sorted = Object.entries(playersMeta).sort((a,b) => (pts[b[0]]||0)-(pts[a[0]]||0));
       const date = week.closedAt ? new Date(week.closedAt).toLocaleDateString('pt-BR') : '';
       const rows = sorted.map(([key, p], i) => `
         <div class="week-ranking-row">
@@ -402,7 +518,7 @@
         </div>`).join('');
       return `<div class="week-card">
         <div class="week-header" onclick="toggleWeek(${wi})">
-          <div><div class="week-label">${week.label || 'Semana encerrada'}</div><div class="week-meta">${week.validated||0} ações · encerrada em ${date}</div></div>
+          <div><div class="week-label">${week.label||'Semana encerrada'}</div><div class="week-meta">${week.validated||0} ações · encerrada em ${date}</div></div>
           <i class="ti ti-chevron-down" id="weekChevron${wi}"></i>
         </div>
         <div class="week-body" id="weekBody${wi}">${rows}</div>
@@ -419,7 +535,7 @@
 
   function updateStats() {
     const pts = state.points || {};
-    document.getElementById('statTotal').textContent = Object.values(pts).reduce((s,v) => s + Number(v), 0);
+    document.getElementById('statTotal').textContent = Object.values(pts).reduce((s,v) => s+Number(v), 0);
     document.getElementById('statActions').textContent = state.validated || 0;
   }
 
@@ -440,21 +556,21 @@
   function openModal(id) { document.getElementById(id).classList.add('open'); }
   function closeModal(id) {
     document.getElementById(id).classList.remove('open');
-    if (id === 'modalOverlay') { document.getElementById('modalPlayer').value = ''; document.getElementById('modalAction').value = ''; document.getElementById('modalLink').value = ''; document.getElementById('btnConfirmAction').disabled = false; document.getElementById('btnConfirmAction').textContent = 'Enviar para validação'; }
-    if (id === 'weekModal') { document.getElementById('weekLabel').value = ''; document.getElementById('btnConfirmWeek').disabled = false; document.getElementById('btnConfirmWeek').innerHTML = '<i class="ti ti-flag"></i> Encerrar e zerar'; }
-    if (id === 'editModal') { editTarget = null; editOp = 'add'; document.getElementById('editPtsValue').value = ''; document.querySelectorAll('.edit-op-btn').forEach(b => b.classList.remove('selected')); document.getElementById('opAdd').classList.add('selected'); document.getElementById('btnConfirmEdit').disabled = false; document.getElementById('btnConfirmEdit').textContent = 'Salvar'; }
+    if (id === 'modalOverlay') { document.getElementById('modalPlayer').value=''; document.getElementById('modalAction').value=''; document.getElementById('modalLink').value=''; document.getElementById('btnConfirmAction').disabled=false; document.getElementById('btnConfirmAction').textContent='Enviar para validação'; }
+    if (id === 'weekModal') { document.getElementById('weekLabel').value=''; document.getElementById('btnConfirmWeek').disabled=false; document.getElementById('btnConfirmWeek').innerHTML='<i class="ti ti-flag"></i> Encerrar e zerar'; }
+    if (id === 'editModal') { editTarget=null; editOp='add'; document.getElementById('editPtsValue').value=''; document.querySelectorAll('.edit-op-btn').forEach(b=>b.classList.remove('selected')); document.getElementById('opAdd').classList.add('selected'); document.getElementById('btnConfirmEdit').disabled=false; document.getElementById('btnConfirmEdit').textContent='Salvar'; }
   }
 
   async function confirmAction() {
     const pk = document.getElementById('modalPlayer').value;
     const pts = document.getElementById('modalAction').value;
     const link = document.getElementById('modalLink').value.trim();
-    if (!pk || !pts) { showToast('Selecione participante e tipo de ação.'); return; }
+    if (!pk||!pts) { showToast('Selecione participante e tipo de ação.'); return; }
     if (!link) { showToast('Cole o link da intranet.'); return; }
     const btn = document.getElementById('btnConfirmAction');
-    btn.disabled = true; btn.textContent = 'Enviando...';
-    try { await saveData('add-pending', { id: String(++idCounter), playerKey: pk, pts, link }); closeModal('modalOverlay'); showToast('Ação enviada! Aguarde validação.'); await loadData(); }
-    catch(e) { showToast('Erro ao enviar.'); btn.disabled = false; btn.textContent = 'Enviar para validação'; }
+    btn.disabled=true; btn.textContent='Enviando...';
+    try { await saveData('add-pending', { id: String(++idCounter), playerKey:pk, pts, link }); closeModal('modalOverlay'); showToast('Ação enviada! Aguarde validação.'); await loadData(); }
+    catch(e) { showToast('Erro ao enviar.'); btn.disabled=false; btn.textContent='Enviar para validação'; }
   }
 
   async function confirmCloseWeek() {
@@ -462,9 +578,9 @@
     const label = document.getElementById('weekLabel').value.trim();
     if (!label) { showToast('Digite o nome da semana.'); return; }
     const btn = document.getElementById('btnConfirmWeek');
-    btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader spinning"></i> Encerrando...';
+    btn.disabled=true; btn.innerHTML='<i class="ti ti-loader spinning"></i> Encerrando...';
     try { await saveData('close-week', { label }); closeModal('weekModal'); showToast('Semana encerrada! Pontos zerados.'); await loadData(); }
-    catch(e) { showToast('Erro ao encerrar semana.'); btn.disabled = false; btn.innerHTML = '<i class="ti ti-flag"></i> Encerrar e zerar'; }
+    catch(e) { showToast('Erro ao encerrar semana.'); btn.disabled=false; btn.innerHTML='<i class="ti ti-flag"></i> Encerrar e zerar'; }
   }
 
   function openEditModal(playerKey) {
@@ -479,22 +595,22 @@
 
   function selectOp(op) {
     editOp = op;
-    document.querySelectorAll('.edit-op-btn').forEach(b => b.classList.remove('selected'));
-    document.getElementById({ add:'opAdd', remove:'opRemove', set:'opSet' }[op]).classList.add('selected');
+    document.querySelectorAll('.edit-op-btn').forEach(b=>b.classList.remove('selected'));
+    document.getElementById({add:'opAdd',remove:'opRemove',set:'opSet'}[op]).classList.add('selected');
   }
 
   async function confirmEdit() {
-    if (!isAdmin || !editTarget) return;
+    if (!isAdmin||!editTarget) return;
     const val = parseInt(document.getElementById('editPtsValue').value);
-    if (isNaN(val) || val < 0) { showToast('Informe um valor válido.'); return; }
+    if (isNaN(val)||val<0) { showToast('Informe um valor válido.'); return; }
     const btn = document.getElementById('btnConfirmEdit');
-    btn.disabled = true; btn.textContent = 'Salvando...';
-    try { await saveData('edit-points', { playerKey: editTarget, op: editOp, value: val }); closeModal('editModal'); showToast('Pontos atualizados!'); await loadData(); }
-    catch(e) { showToast('Erro ao salvar.'); btn.disabled = false; btn.textContent = 'Salvar'; }
+    btn.disabled=true; btn.textContent='Salvando...';
+    try { await saveData('edit-points', { playerKey:editTarget, op:editOp, value:val }); closeModal('editModal'); showToast('Pontos atualizados!'); await loadData(); }
+    catch(e) { showToast('Erro ao salvar.'); btn.disabled=false; btn.textContent='Salvar'; }
   }
 
   ['modalOverlay','weekModal','editModal'].forEach(id => {
-    document.getElementById(id).addEventListener('click', function(e) { if (e.target === this) closeModal(id); });
+    document.getElementById(id).addEventListener('click', function(e) { if (e.target===this) closeModal(id); });
   });
 
   loadData();
