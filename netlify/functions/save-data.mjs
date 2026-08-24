@@ -10,19 +10,15 @@ function resolvePoints(pts) {
 }
 
 export default async (req, context) => {
-  if (req.method !== "POST") {
-    return new Response("Method not allowed", { status: 405 });
-  }
+  if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
 
   const body = await req.json();
   const { action, payload } = body;
   const store = getStore({ name: "painel-desafio", consistency: "strong" });
 
   const getItem = async (key, fallback) => {
-    try {
-      const raw = await store.get(key);
-      return raw ? JSON.parse(raw) : fallback;
-    } catch { return fallback; }
+    try { const raw = await store.get(key); return raw ? JSON.parse(raw) : fallback; }
+    catch { return fallback; }
   };
 
   if (action === "add-pending") {
@@ -45,17 +41,49 @@ export default async (req, context) => {
     points[playerKey] = (points[playerKey] || 0) + resolvedPts;
 
     history.unshift({
-      id, playerKey,
-      pts: item?.pts || pts,
-      resolvedPts,
-      link: item?.link || "",
-      validatedAt: new Date().toISOString()
+      id, playerKey, pts: item?.pts || pts, resolvedPts,
+      link: item?.link || "", validatedAt: new Date().toISOString()
     });
 
     await store.set("pending", JSON.stringify(newPending));
     await store.set("points", JSON.stringify(points));
     await store.set("validated", JSON.stringify(validated + 1));
     await store.set("history", JSON.stringify(history));
+    return Response.json({ ok: true });
+  }
+
+  if (action === "deny-pending") {
+    const { id, reason } = payload;
+    const pending = await getItem("pending", []);
+    const denied = await getItem("denied", []);
+
+    const item = pending.find(p => p.id === id);
+    if (item) denied.unshift({ ...item, reason, deniedAt: new Date().toISOString() });
+
+    await store.set("pending", JSON.stringify(pending.filter(p => p.id !== id)));
+    await store.set("denied", JSON.stringify(denied));
+    return Response.json({ ok: true });
+  }
+
+  if (action === "delete-pending") {
+    const { id } = payload;
+    const pending = await getItem("pending", []);
+    await store.set("pending", JSON.stringify(pending.filter(p => p.id !== id)));
+    return Response.json({ ok: true });
+  }
+
+  if (action === "delete-history") {
+    const { id } = payload;
+    const history = await getItem("history", []);
+    const points = await getItem("points", { jane: 0, lucas: 0, ana: 0, larissa: 0, arthur: 0 });
+    const validated = await getItem("validated", 0);
+
+    const item = history.find(h => h.id === id);
+    if (item) points[item.playerKey] = Math.max(0, (points[item.playerKey] || 0) - resolvePoints(item.pts));
+
+    await store.set("history", JSON.stringify(history.filter(h => h.id !== id)));
+    await store.set("points", JSON.stringify(points));
+    await store.set("validated", JSON.stringify(Math.max(0, validated - 1)));
     return Response.json({ ok: true });
   }
 
@@ -69,38 +97,17 @@ export default async (req, context) => {
     return Response.json({ ok: true });
   }
 
-  if (action === "delete-pending") {
-    const { id } = payload;
-    const pending = await getItem("pending", []);
-    await store.set("pending", JSON.stringify(pending.filter(p => p.id !== id)));
-    return Response.json({ ok: true });
-  }
-
   if (action === "zero-today") {
     const history = await getItem("history", []);
     const points = await getItem("points", { jane: 0, lucas: 0, ana: 0, larissa: 0, arthur: 0 });
     const validated = await getItem("validated", 0);
-
     const today = new Date().toLocaleDateString('pt-BR');
-    const todayItems = history.filter(h => {
-      if (!h.validatedAt) return false;
-      return new Date(h.validatedAt).toLocaleDateString('pt-BR') === today;
-    });
-
-    todayItems.forEach(h => {
-      const resolvedPts = resolvePoints(h.pts);
-      points[h.playerKey] = Math.max(0, (points[h.playerKey] || 0) - resolvedPts);
-    });
-
-    const newHistory = history.filter(h => {
-      if (!h.validatedAt) return true;
-      return new Date(h.validatedAt).toLocaleDateString('pt-BR') !== today;
-    });
-
-    await store.set("history", JSON.stringify(newHistory));
+    const todayItems = history.filter(h => h.validatedAt && new Date(h.validatedAt).toLocaleDateString('pt-BR') === today);
+    todayItems.forEach(h => { points[h.playerKey] = Math.max(0, (points[h.playerKey] || 0) - resolvePoints(h.pts)); });
+    await store.set("history", JSON.stringify(history.filter(h => !h.validatedAt || new Date(h.validatedAt).toLocaleDateString('pt-BR') !== today)));
     await store.set("points", JSON.stringify(points));
     await store.set("validated", JSON.stringify(Math.max(0, validated - todayItems.length)));
-    return Response.json({ ok: true, removed: todayItems.length });
+    return Response.json({ ok: true });
   }
 
   if (action === "close-week") {
@@ -108,17 +115,13 @@ export default async (req, context) => {
     const points = await getItem("points", { jane: 0, lucas: 0, ana: 0, larissa: 0, arthur: 0 });
     const validated = await getItem("validated", 0);
     const weeks = await getItem("weeks", []);
-
-    weeks.unshift({
-      label, points: { ...points }, validated,
-      closedAt: new Date().toISOString()
-    });
-
+    weeks.unshift({ label, points: { ...points }, validated, closedAt: new Date().toISOString() });
     await store.set("weeks", JSON.stringify(weeks));
     await store.set("points", JSON.stringify({ jane: 0, lucas: 0, ana: 0, larissa: 0, arthur: 0 }));
     await store.set("validated", JSON.stringify(0));
     await store.set("history", JSON.stringify([]));
     await store.set("pending", JSON.stringify([]));
+    await store.set("denied", JSON.stringify([]));
     return Response.json({ ok: true });
   }
 
