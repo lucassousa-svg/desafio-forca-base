@@ -51,12 +51,13 @@
     .av-lucas { background: #EAF3DE; color: #27500A; }
     .av-ana { background: #FAECE7; color: #712B13; }
     .av-larissa { background: #EEEDFE; color: #3C3489; }
+    .av-arthur { background: #FEF0E6; color: #93340A; }
     .player-name { font-size: 14px; font-weight: 500; color: var(--text); }
     .player-alias { font-size: 11px; color: var(--text-muted); background: var(--surface2); padding: 2px 8px; border-radius: 10px; display: inline-block; margin-top: 2px; }
     .bar-wrap { display: flex; align-items: center; }
     .bar-bg { flex: 1; background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
-    .bar-jane { background: #378ADD; } .bar-lucas { background: #639922; } .bar-ana { background: #D85A30; } .bar-larissa { background: #7F77DD; }
+    .bar-jane { background: #378ADD; } .bar-lucas { background: #639922; } .bar-ana { background: #D85A30; } .bar-larissa { background: #7F77DD; } .bar-arthur { background: #E8720C; }
     .points-cell { text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
     .points-big { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
     .points-label { font-size: 11px; color: var(--text-faint); }
@@ -157,7 +158,6 @@
     <h1>Força da Base<br>Missão MRR Multipower</h1>
     <p>Ranking atualizado em tempo real · Poste sua ação e aguarde validação</p>
   </div>
-
   <div class="admin-bar">
     <div class="admin-input-wrap">
       <i class="ti ti-lock"></i>
@@ -166,44 +166,38 @@
     <button class="admin-btn" onclick="tryAdmin()"><i class="ti ti-shield-check"></i> Entrar</button>
     <div id="adminStatus"></div>
   </div>
-
   <div class="stats-grid">
     <div class="stat-card"><div class="stat-label">Total de pontos</div><div class="stat-value" id="statTotal">—</div><div class="stat-sub">semana atual</div></div>
     <div class="stat-card"><div class="stat-label">Ações validadas</div><div class="stat-value" id="statActions">—</div><div class="stat-sub">semana atual</div></div>
     <div class="stat-card"><div class="stat-label">Líder atual</div><div class="stat-value" id="statLeader" style="font-size:18px; padding-top:4px">—</div><div class="stat-sub" id="statLeaderPts"></div></div>
   </div>
-
   <div class="section-header">
     <div class="section-title" style="margin-bottom:0">Ranking — semana atual</div>
     <button class="close-week-btn" onclick="openModal('weekModal')"><i class="ti ti-flag"></i> Encerrar semana</button>
   </div>
   <div class="card" id="rankingCard"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
-
   <div class="section-title">Tabela de pontos</div>
   <div class="legend-grid">
-    <div class="legend-item"><span class="legend-emoji">⚡</span><div><div class="legend-name">Reativação</div><div class="legend-desc">Cliente 30+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">50</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">⚡</span><div><div class="legend-name">Reativação</div><div class="legend-desc">30+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">50</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">🔄</span><div><div class="legend-name">Recuperação</div><div class="legend-desc">50+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">60</div><div class="legend-pts-lbl">pts</div></div></div>
     <div class="legend-item"><span class="legend-emoji">📈</span><div><div class="legend-name">Upgrade de plano</div><div class="legend-desc">Bronze → Prata etc.</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
-    <div class="legend-item"><span class="legend-emoji">➕</span><div><div class="legend-name">Upsell add-on</div><div class="legend-desc">Por cliente</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">25</div><div class="legend-pts-lbl">pts</div></div></div>
-    <div class="legend-item"><span class="legend-emoji">🛡️</span><div><div class="legend-name">Retenção (churn)</div><div class="legend-desc">Cliente salvo</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">20</div><div class="legend-pts-lbl">pts</div></div></div>
-    <div class="legend-item"><span class="legend-emoji">⏳</span><div><div class="legend-name">Renovação</div><div class="legend-desc">Melhor desempenho diário</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">18</div><div class="legend-pts-lbl">pts</div></div></div>
-    <div class="legend-item"><span class="legend-emoji">📞</span><div><div class="legend-name">Atividade comercial</div><div class="legend-desc">Melhor desempenho diário</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">10</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">⏫</span><div><div class="legend-name">Upgrade de duração</div><div class="legend-desc">Mensal → Anual</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">⭐</span><div><div class="legend-name">Avaliação no Google</div><div class="legend-desc">Por avaliação obtida</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">15</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">➕</span><div><div class="legend-name">Upsell add-on</div><div class="legend-desc">Por cliente</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
+    <div class="legend-item"><span class="legend-emoji">🛡️</span><div><div class="legend-name">Retenção (churn)</div><div class="legend-desc">Cliente salvo</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
   </div>
-
   <div class="section-title">Ações pendentes de validação</div>
   <div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin-bottom:12px;">
     <button class="add-btn" style="margin-bottom:0" onclick="openModal('modalOverlay')"><i class="ti ti-plus"></i> Registrar nova ação</button>
     <button class="refresh-btn" onclick="loadData(true)"><i class="ti ti-refresh" id="refreshIcon"></i> Atualizar</button>
   </div>
   <div class="pending-list" id="pendingList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
-
   <div class="section-title" style="margin-top:1.5rem">Histórico da semana atual</div>
   <div class="history-list" id="historyList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
-
   <div class="section-title" style="margin-top:1.5rem">Semanas anteriores</div>
   <div id="weeksList"><div class="empty-state">Nenhuma semana encerrada ainda.</div></div>
 </div>
 
-<!-- Modal registrar ação -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2>Registrar ação</h2>
@@ -214,15 +208,17 @@
       <option value="lucas">Lucas Neiva (Mineirinho)</option>
       <option value="ana">Ana Luiza (Incendiária)</option>
       <option value="larissa">Larissa (BOPE)</option>
+      <option value="arthur">Arthur (Aspira)</option>
     </select>
     <select id="modalAction">
       <option value="">Tipo de ação...</option>
-      <option value="50">⚡ Reativação — 50 pts</option>
+      <option value="50">⚡ Reativação (30+ dias) — 50 pts</option>
+      <option value="60">🔄 Recuperação (50+ dias) — 60 pts</option>
       <option value="30">📈 Upgrade de plano — 30 pts</option>
-      <option value="25">➕ Upsell add-on — 25 pts</option>
-      <option value="20">🛡️ Retenção (churn) — 20 pts</option>
-      <option value="18">⏳ Renovação — 18 pts</option>
-      <option value="10">📞 Atividade comercial — 10 pts</option>
+      <option value="40">⏫ Upgrade de duração (mensal → anual) — 40 pts</option>
+      <option value="15">⭐ Avaliação no Google — 15 pts</option>
+      <option value="30u">➕ Upsell add-on — 30 pts</option>
+      <option value="30r">🛡️ Retenção (churn) — 30 pts</option>
     </select>
     <input type="text" id="modalLink" placeholder="Link da intranet (obrigatório)" />
     <div class="link-hint">Cole o link da intranet para que o administrador possa validar.</div>
@@ -233,11 +229,10 @@
   </div>
 </div>
 
-<!-- Modal encerrar semana -->
 <div class="modal-overlay" id="weekModal">
   <div class="modal">
     <h2>Encerrar semana</h2>
-    <p>O ranking atual será salvo no histórico e os pontos serão zerados para a próxima semana. Esta ação não pode ser desfeita.</p>
+    <p>O ranking atual será salvo no histórico e os pontos serão zerados. Esta ação não pode ser desfeita.</p>
     <input type="text" id="weekLabel" placeholder="Nome da semana (ex: Semana 1 — 02/06 a 06/06)" />
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('weekModal')">Cancelar</button>
@@ -246,7 +241,6 @@
   </div>
 </div>
 
-<!-- Modal editar pontos -->
 <div class="modal-overlay" id="editModal">
   <div class="modal">
     <h2>Editar pontos</h2>
@@ -275,42 +269,41 @@
     lucas:   { name: 'Lucas Neiva', alias: 'Mineirinho',  av: 'LN', cls: 'av-lucas',   bar: 'bar-lucas'   },
     ana:     { name: 'Ana Luiza',   alias: 'Incendiária', av: 'AL', cls: 'av-ana',     bar: 'bar-ana'     },
     larissa: { name: 'Larissa',     alias: 'BOPE',        av: 'LA', cls: 'av-larissa', bar: 'bar-larissa' },
+    arthur:  { name: 'Arthur',      alias: 'Aspira',      av: 'AR', cls: 'av-arthur',  bar: 'bar-arthur'  },
   };
   const actionLabels = {
-    50: '⚡ Reativação', 30: '📈 Upgrade de plano', 25: '➕ Upsell add-on',
-    20: '🛡️ Retenção (churn)', 18: '⏳ Renovação', 10: '📞 Atividade comercial',
+    '50':  '⚡ Reativação (30+ dias)',
+    '60':  '🔄 Recuperação (50+ dias)',
+    '30':  '📈 Upgrade de plano',
+    '40':  '⏫ Upgrade de duração',
+    '15':  '⭐ Avaliação no Google',
+    '30u': '➕ Upsell add-on',
+    '30r': '🛡️ Retenção (churn)',
   };
 
+  function getLabel(pts) { return actionLabels[String(pts)] || `+${parseInt(pts)||0} pts`; }
+  function getPoints(pts) { return parseInt(pts) || 0; }
+
   let state = { points: {}, pending: [], validated: 0, history: [], weeks: [] };
-  let isAdmin = false;
-  let editTarget = null;
-  let editOp = 'add';
-  let idCounter = Date.now();
+  let isAdmin = false, editTarget = null, editOp = 'add', idCounter = Date.now();
 
   function showToast(msg) {
     const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
+    t.textContent = msg; t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
   async function loadData(showRefresh = false) {
     const icon = document.getElementById('refreshIcon');
     if (showRefresh) icon.classList.add('spinning');
-    try {
-      const res = await fetch('/api/get-data');
-      if (!res.ok) throw new Error();
-      state = await res.json();
-    } catch(e) { console.error(e); }
+    try { const res = await fetch('/api/get-data'); if (!res.ok) throw new Error(); state = await res.json(); }
+    catch(e) { console.error(e); }
     if (showRefresh) { icon.classList.remove('spinning'); showToast('Dados atualizados!'); }
     renderRanking(); renderPending(); renderHistory(); renderWeeks(); updateStats();
   }
 
   async function saveData(action, payload) {
-    const res = await fetch('/api/save-data', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, payload })
-    });
+    const res = await fetch('/api/save-data', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, payload }) });
     if (!res.ok) throw new Error('Erro ao salvar');
     return res.json();
   }
@@ -345,15 +338,10 @@
       const barPct = Math.round(((pts[key]||0) / maxPts) * 100);
       return `<div class="ranking-row">
         <div style="text-align:center">${rankIcon(i+1)}</div>
-        <div class="player-cell">
-          <div class="avatar ${p.cls}">${p.av}</div>
-          <div><div class="player-name">${p.name}</div><div class="player-alias">${p.alias}</div></div>
-        </div>
+        <div class="player-cell"><div class="avatar ${p.cls}">${p.av}</div><div><div class="player-name">${p.name}</div><div class="player-alias">${p.alias}</div></div></div>
         <div class="bar-wrap"><div class="bar-bg"><div class="bar-fill ${p.bar}" style="width:${barPct}%"></div></div></div>
-        <div class="points-cell">
-          <div><div class="points-big">${pts[key]||0}</div><div class="points-label">pts</div></div>
-          <button class="edit-pts-btn" onclick="openEditModal('${key}')" title="Editar pontos"><i class="ti ti-pencil"></i></button>
-        </div>
+        <div class="points-cell"><div><div class="points-big">${pts[key]||0}</div><div class="points-label">pts</div></div>
+          <button class="edit-pts-btn" onclick="openEditModal('${key}')"><i class="ti ti-pencil"></i></button></div>
       </div>`;
     }).join('');
     const leader = sorted[0];
@@ -370,11 +358,11 @@
       const linkHtml = item.link ? `<a href="${item.link}" target="_blank" rel="noopener" style="font-size:11px; color:#0268CD; text-decoration:none; white-space:nowrap; margin-right:4px;"><i class="ti ti-external-link" style="font-size:12px"></i> ver link</a>` : '';
       return `<div class="pending-item" id="pend-${item.id}">
         <div class="pending-avatar ${p.cls}">${p.av}</div>
-        <div class="pending-name">${p.name} <span class="pending-action">— ${actionLabels[item.pts]}</span></div>
+        <div class="pending-name">${p.name} <span class="pending-action">— ${getLabel(item.pts)}</span></div>
         ${linkHtml}
-        <span class="pending-pts">+${item.pts} pts</span>
-        <button class="validate-btn" onclick="validate('${item.id}','${item.playerKey}',${item.pts})"><i class="ti ti-check"></i> Validar</button>
-        <button class="delete-btn" onclick="deletePending('${item.id}')" title="Remover"><i class="ti ti-trash"></i></button>
+        <span class="pending-pts">+${getPoints(item.pts)} pts</span>
+        <button class="validate-btn" onclick="validate('${item.id}','${item.playerKey}','${item.pts}')"><i class="ti ti-check"></i> Validar</button>
+        <button class="delete-btn" onclick="deletePending('${item.id}')"><i class="ti ti-trash"></i></button>
       </div>`;
     }).join('');
   }
@@ -385,14 +373,13 @@
     if (!history.length) { list.innerHTML = '<div class="empty-state">Nenhuma ação validada ainda nesta semana.</div>'; return; }
     list.innerHTML = history.map(item => {
       const p = playersMeta[item.playerKey]; if (!p) return '';
-      const label = actionLabels[item.pts] || `${item.pts} pts`;
       const date = item.validatedAt ? new Date(item.validatedAt).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : '';
       const linkHtml = item.link ? `<a href="${item.link}" target="_blank" rel="noopener" class="history-link"><i class="ti ti-external-link"></i> ver link</a>` : '<span style="font-size:11px; color:var(--text-faint)">sem link</span>';
       return `<div class="history-item">
         <div class="history-avatar ${p.cls}">${p.av}</div>
-        <div class="history-info"><div class="history-name">${p.name}</div><div class="history-action">${label}</div></div>
+        <div class="history-info"><div class="history-name">${p.name}</div><div class="history-action">${getLabel(item.pts)}</div></div>
         ${linkHtml}
-        <span class="history-pts">+${item.pts} pts</span>
+        <span class="history-pts">+${getPoints(item.pts)} pts</span>
         <span class="history-date">${date}</span>
       </div>`;
     }).join('');
@@ -415,10 +402,7 @@
         </div>`).join('');
       return `<div class="week-card">
         <div class="week-header" onclick="toggleWeek(${wi})">
-          <div>
-            <div class="week-label">${week.label || 'Semana encerrada'}</div>
-            <div class="week-meta">${week.validated || 0} ações validadas · encerrada em ${date}</div>
-          </div>
+          <div><div class="week-label">${week.label || 'Semana encerrada'}</div><div class="week-meta">${week.validated||0} ações · encerrada em ${date}</div></div>
           <i class="ti ti-chevron-down" id="weekChevron${wi}"></i>
         </div>
         <div class="week-body" id="weekBody${wi}">${rows}</div>
@@ -456,40 +440,21 @@
   function openModal(id) { document.getElementById(id).classList.add('open'); }
   function closeModal(id) {
     document.getElementById(id).classList.remove('open');
-    if (id === 'modalOverlay') {
-      document.getElementById('modalPlayer').value = '';
-      document.getElementById('modalAction').value = '';
-      document.getElementById('modalLink').value = '';
-      document.getElementById('btnConfirmAction').disabled = false;
-      document.getElementById('btnConfirmAction').textContent = 'Enviar para validação';
-    }
-    if (id === 'weekModal') {
-      document.getElementById('weekLabel').value = '';
-      document.getElementById('btnConfirmWeek').disabled = false;
-      document.getElementById('btnConfirmWeek').innerHTML = '<i class="ti ti-flag"></i> Encerrar e zerar';
-    }
-    if (id === 'editModal') {
-      editTarget = null; editOp = 'add';
-      document.getElementById('editPtsValue').value = '';
-      document.querySelectorAll('.edit-op-btn').forEach(b => b.classList.remove('selected'));
-      document.getElementById('opAdd').classList.add('selected');
-      document.getElementById('btnConfirmEdit').disabled = false;
-      document.getElementById('btnConfirmEdit').textContent = 'Salvar';
-    }
+    if (id === 'modalOverlay') { document.getElementById('modalPlayer').value = ''; document.getElementById('modalAction').value = ''; document.getElementById('modalLink').value = ''; document.getElementById('btnConfirmAction').disabled = false; document.getElementById('btnConfirmAction').textContent = 'Enviar para validação'; }
+    if (id === 'weekModal') { document.getElementById('weekLabel').value = ''; document.getElementById('btnConfirmWeek').disabled = false; document.getElementById('btnConfirmWeek').innerHTML = '<i class="ti ti-flag"></i> Encerrar e zerar'; }
+    if (id === 'editModal') { editTarget = null; editOp = 'add'; document.getElementById('editPtsValue').value = ''; document.querySelectorAll('.edit-op-btn').forEach(b => b.classList.remove('selected')); document.getElementById('opAdd').classList.add('selected'); document.getElementById('btnConfirmEdit').disabled = false; document.getElementById('btnConfirmEdit').textContent = 'Salvar'; }
   }
 
   async function confirmAction() {
     const pk = document.getElementById('modalPlayer').value;
-    const pts = parseInt(document.getElementById('modalAction').value);
+    const pts = document.getElementById('modalAction').value;
     const link = document.getElementById('modalLink').value.trim();
     if (!pk || !pts) { showToast('Selecione participante e tipo de ação.'); return; }
     if (!link) { showToast('Cole o link da intranet.'); return; }
     const btn = document.getElementById('btnConfirmAction');
     btn.disabled = true; btn.textContent = 'Enviando...';
-    try {
-      await saveData('add-pending', { id: String(++idCounter), playerKey: pk, pts, link });
-      closeModal('modalOverlay'); showToast('Ação enviada! Aguarde validação.'); await loadData();
-    } catch(e) { showToast('Erro ao enviar.'); btn.disabled = false; btn.textContent = 'Enviar para validação'; }
+    try { await saveData('add-pending', { id: String(++idCounter), playerKey: pk, pts, link }); closeModal('modalOverlay'); showToast('Ação enviada! Aguarde validação.'); await loadData(); }
+    catch(e) { showToast('Erro ao enviar.'); btn.disabled = false; btn.textContent = 'Enviar para validação'; }
   }
 
   async function confirmCloseWeek() {
@@ -498,10 +463,8 @@
     if (!label) { showToast('Digite o nome da semana.'); return; }
     const btn = document.getElementById('btnConfirmWeek');
     btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader spinning"></i> Encerrando...';
-    try {
-      await saveData('close-week', { label });
-      closeModal('weekModal'); showToast('Semana encerrada! Pontos zerados.'); await loadData();
-    } catch(e) { showToast('Erro ao encerrar semana.'); btn.disabled = false; btn.innerHTML = '<i class="ti ti-flag"></i> Encerrar e zerar'; }
+    try { await saveData('close-week', { label }); closeModal('weekModal'); showToast('Semana encerrada! Pontos zerados.'); await loadData(); }
+    catch(e) { showToast('Erro ao encerrar semana.'); btn.disabled = false; btn.innerHTML = '<i class="ti ti-flag"></i> Encerrar e zerar'; }
   }
 
   function openEditModal(playerKey) {
@@ -526,10 +489,8 @@
     if (isNaN(val) || val < 0) { showToast('Informe um valor válido.'); return; }
     const btn = document.getElementById('btnConfirmEdit');
     btn.disabled = true; btn.textContent = 'Salvando...';
-    try {
-      await saveData('edit-points', { playerKey: editTarget, op: editOp, value: val });
-      closeModal('editModal'); showToast('Pontos atualizados!'); await loadData();
-    } catch(e) { showToast('Erro ao salvar.'); btn.disabled = false; btn.textContent = 'Salvar'; }
+    try { await saveData('edit-points', { playerKey: editTarget, op: editOp, value: val }); closeModal('editModal'); showToast('Pontos atualizados!'); await loadData(); }
+    catch(e) { showToast('Erro ao salvar.'); btn.disabled = false; btn.textContent = 'Salvar'; }
   }
 
   ['modalOverlay','weekModal','editModal'].forEach(id => {
