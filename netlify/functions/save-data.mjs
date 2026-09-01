@@ -1,131 +1,22 @@
-import { getStore } from "@netlify/blobs";
+Com base nas anotações da entrevista, aqui está o resumo das falas e a avaliação do perfil de Luan Felipe Patrocínio Pereira:
 
-const ptsMap = {
-  '50': 50, '60': 60, '30': 30, '40': 40, '15': 15,
-  '30u': 30, '30r': 30, '40i': 40, '10a': 10,
-};
+### Resumo das falas e contribuições
 
-function resolvePoints(pts) {
-  return ptsMap[String(pts)] ?? parseInt(pts) ?? 0;
-}
+  * **Perfil e Motivação:** Atualmente analista de suporte nível um com dois anos de empresa, Luan expressa forte desejo de crescimento interno. Ele se define por um perfil consultivo, que busca ensinar o cliente a extrair o potencial máximo do sistema em vez de apenas resolver chamados técnicos.
+  * **Experiência:** Destaca passagens positivas pela implantação (com feedbacks favoráveis de colegas) e uma experiência prévia em CS na empresa BROTeg, onde treinava usuários e consultores sobre o funcionamento de sistemas.
+  * **Proatividade Técnica:** Cursa Análise e Desenvolvimento de Sistemas e demonstrou iniciativa ao desenvolver uma funcionalidade para importação de grades e variações de produtos, o que viabilizou o fechamento de um contrato.
+  * **Metodologia de Atendimento:** Adota uma abordagem paciente e guiada para clientes com pouca afinidade tecnológica, utilizando suporte telefônico combinado com compartilhamento de tela para garantir a compreensão do usuário.
+  * **Objetivos:** Busca desafios de maior impacto e responsabilidade técnica dentro da Gestão Click nos próximos dois anos.
 
-export default async (req, context) => {
-  if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
+### Avaliação do Perfil
 
-  const body = await req.json();
-  const { action, payload } = body;
-  const store = getStore({ name: "painel-desafio", consistency: "strong" });
+Luan apresenta um perfil altamente alinhado às necessidades da vaga de Sucesso do Cliente (expansão):
 
-  const getItem = async (key, fallback) => {
-    try { const raw = await store.get(key); return raw ? JSON.parse(raw) : fallback; }
-    catch { return fallback; }
-  };
+  * **Pontos Fortes:**
+      * **Conhecimento Interno:** Já conhece a cultura e os processos da Gestão Click (2 anos de casa), o que reduz o tempo de adaptação.
+      * **Mindset de CS:** Sua visão consultiva e foco em "ensinar o cliente" (educação de produto) é essencial para o papel de *onboarding* e pós-venda.
+      * **Adaptabilidade:** A transição comprovada para a implantação e o feedback positivo dos pares sugerem que ele é um profissional capaz de transitar entre áreas com competência.
+      * **Perfil Técnico-Consultivo:** A combinação de suporte técnico com a criação de soluções (ex: funcionalidade de grades) indica um profissional que não apenas executa, mas busca melhorias para o ecossistema da empresa.
+  * **Conclusão:** É um candidato forte. Sua abordagem demonstra maturidade profissional e uma visão de longo prazo sobre o sucesso do cliente, sendo um candidato promissor para o setor de expansão.
 
-  if (action === "add-pending") {
-    const pending = await getItem("pending", []);
-    pending.push(payload);
-    await store.set("pending", JSON.stringify(pending));
-    return Response.json({ ok: true });
-  }
-
-  if (action === "validate") {
-    const { id, playerKey, pts } = payload;
-    const pending = await getItem("pending", []);
-    const points = await getItem("points", { jane: 0, lucas: 0, ana: 0, larissa: 0, arthur: 0 });
-    const validated = await getItem("validated", 0);
-    const history = await getItem("history", []);
-
-    const item = pending.find(p => p.id === id);
-    const newPending = pending.filter(p => p.id !== id);
-    const resolvedPts = resolvePoints(pts);
-    points[playerKey] = (points[playerKey] || 0) + resolvedPts;
-
-    history.unshift({
-      id, playerKey, pts: item?.pts || pts, resolvedPts,
-      link: item?.link || "", validatedAt: new Date().toISOString()
-    });
-
-    await store.set("pending", JSON.stringify(newPending));
-    await store.set("points", JSON.stringify(points));
-    await store.set("validated", JSON.stringify(validated + 1));
-    await store.set("history", JSON.stringify(history));
-    return Response.json({ ok: true });
-  }
-
-  if (action === "deny-pending") {
-    const { id, reason } = payload;
-    const pending = await getItem("pending", []);
-    const denied = await getItem("denied", []);
-
-    const item = pending.find(p => p.id === id);
-    if (item) denied.unshift({ ...item, reason, deniedAt: new Date().toISOString() });
-
-    await store.set("pending", JSON.stringify(pending.filter(p => p.id !== id)));
-    await store.set("denied", JSON.stringify(denied));
-    return Response.json({ ok: true });
-  }
-
-  if (action === "delete-pending") {
-    const { id } = payload;
-    const pending = await getItem("pending", []);
-    await store.set("pending", JSON.stringify(pending.filter(p => p.id !== id)));
-    return Response.json({ ok: true });
-  }
-
-  if (action === "delete-history") {
-    const { id } = payload;
-    const history = await getItem("history", []);
-    const points = await getItem("points", { jane: 0, lucas: 0, ana: 0, larissa: 0, arthur: 0 });
-    const validated = await getItem("validated", 0);
-
-    const item = history.find(h => h.id === id);
-    if (item) points[item.playerKey] = Math.max(0, (points[item.playerKey] || 0) - resolvePoints(item.pts));
-
-    await store.set("history", JSON.stringify(history.filter(h => h.id !== id)));
-    await store.set("points", JSON.stringify(points));
-    await store.set("validated", JSON.stringify(Math.max(0, validated - 1)));
-    return Response.json({ ok: true });
-  }
-
-  if (action === "edit-points") {
-    const { playerKey, op, value } = payload;
-    const points = await getItem("points", { jane: 0, lucas: 0, ana: 0, larissa: 0, arthur: 0 });
-    if (op === "add") points[playerKey] = (points[playerKey] || 0) + Number(value);
-    else if (op === "remove") points[playerKey] = Math.max(0, (points[playerKey] || 0) - Number(value));
-    else if (op === "set") points[playerKey] = Number(value);
-    await store.set("points", JSON.stringify(points));
-    return Response.json({ ok: true });
-  }
-
-  if (action === "zero-today") {
-    const history = await getItem("history", []);
-    const points = await getItem("points", { jane: 0, lucas: 0, ana: 0, larissa: 0, arthur: 0 });
-    const validated = await getItem("validated", 0);
-    const today = new Date().toLocaleDateString('pt-BR');
-    const todayItems = history.filter(h => h.validatedAt && new Date(h.validatedAt).toLocaleDateString('pt-BR') === today);
-    todayItems.forEach(h => { points[h.playerKey] = Math.max(0, (points[h.playerKey] || 0) - resolvePoints(h.pts)); });
-    await store.set("history", JSON.stringify(history.filter(h => !h.validatedAt || new Date(h.validatedAt).toLocaleDateString('pt-BR') !== today)));
-    await store.set("points", JSON.stringify(points));
-    await store.set("validated", JSON.stringify(Math.max(0, validated - todayItems.length)));
-    return Response.json({ ok: true });
-  }
-
-  if (action === "close-week") {
-    const { label } = payload;
-    const points = await getItem("points", { jane: 0, lucas: 0, ana: 0, larissa: 0, arthur: 0 });
-    const validated = await getItem("validated", 0);
-    const weeks = await getItem("weeks", []);
-    weeks.unshift({ label, points: { ...points }, validated, closedAt: new Date().toISOString() });
-    await store.set("weeks", JSON.stringify(weeks));
-    await store.set("points", JSON.stringify({ jane: 0, lucas: 0, ana: 0, larissa: 0, arthur: 0 }));
-    await store.set("validated", JSON.stringify(0));
-    await store.set("history", JSON.stringify([]));
-    await store.set("pending", JSON.stringify([]));
-    await store.set("denied", JSON.stringify([]));
-    return Response.json({ ok: true });
-  }
-
-  return Response.json({ error: "Unknown action" }, { status: 400 });
-};
-
-export const config = { path: "/api/save-data" };
+Gostaria que eu comparasse este perfil com os requisitos da vaga ou redigisse um rascunho de parecer técnico para a avaliação do gestor?
