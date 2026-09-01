@@ -233,11 +233,15 @@
       <div class="legend-item legend-tier-2"><span class="legend-emoji">⚡</span><div><div class="legend-name">Reativação</div><div class="legend-desc">30+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">50</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item legend-tier-2"><span class="legend-emoji">🤝</span><div><div class="legend-name">Indicação gerada</div><div class="legend-desc">Cliente indicou outro</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item legend-tier-2"><span class="legend-emoji">⏫</span><div><div class="legend-name">Upgrade de duração</div><div class="legend-desc">Mensal → Anual</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
+      <div class="legend-item"><span class="legend-emoji">⏫</span><div><div class="legend-name">Upgrade de duração</div><div class="legend-desc">Trimestral → Semestral</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
+      <div class="legend-item"><span class="legend-emoji">⏫</span><div><div class="legend-name">Upgrade de duração</div><div class="legend-desc">Semestral → Anual</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item"><span class="legend-emoji">📈</span><div><div class="legend-name">Upgrade de plano</div><div class="legend-desc">Bronze → Prata etc.</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item"><span class="legend-emoji">➕</span><div><div class="legend-name">Upsell add-on</div><div class="legend-desc">Por cliente</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">25</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item"><span class="legend-emoji">🛡️</span><div><div class="legend-name">Retenção (churn)</div><div class="legend-desc">Cliente salvo</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item"><span class="legend-emoji">⭐</span><div><div class="legend-name">Avaliação no Google</div><div class="legend-desc">Por avaliação obtida</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">15</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item"><span class="legend-emoji">📅</span><div><div class="legend-name">Antecipação de renovação</div><div class="legend-desc">Antes do vencimento</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">10</div><div class="legend-pts-lbl">pts</div></div></div>
+      <div class="legend-item"><span class="legend-emoji">💎</span><div><div class="legend-name">Plano acima de R$3k</div><div class="legend-desc">Por contrato fechado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">20</div><div class="legend-pts-lbl">pts</div></div></div>
+      <div class="legend-item legend-tier-2"><span class="legend-emoji">💎</span><div><div class="legend-name">Plano acima de R$6k</div><div class="legend-desc">Por contrato fechado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
     </div>
 
     <div class="section-title">Ações pendentes de validação</div>
@@ -292,11 +296,15 @@
       <option value="60">🔄 Recuperação (50+ dias) — 60 pts</option>
       <option value="30">📈 Upgrade de plano — 30 pts</option>
       <option value="40">⏫ Upgrade de duração (mensal → anual) — 40 pts</option>
+      <option value="30ts">⏫ Upgrade de duração (trimestral → semestral) — 30 pts</option>
+      <option value="30sa">⏫ Upgrade de duração (semestral → anual) — 30 pts</option>
       <option value="15">⭐ Avaliação no Google — 15 pts</option>
       <option value="25u">➕ Upsell add-on — 25 pts</option>
       <option value="30r">🛡️ Retenção (churn) — 30 pts</option>
       <option value="40i">🤝 Indicação gerada — 40 pts</option>
       <option value="10a">📅 Antecipação de renovação — 10 pts</option>
+      <option value="20k">💎 Plano acima de R$3k — 20 pts</option>
+      <option value="40k">💎 Plano acima de R$6k — 40 pts</option>
     </select>
     <input type="text" id="modalLink" placeholder="Link da intranet (obrigatório)" />
     <div class="link-hint">Cole o link da intranet para que o administrador possa validar.</div>
@@ -405,14 +413,17 @@ const playersMeta = {
 };
 const actionLabels = {
   '50':'⚡ Reativação (30+ dias)','60':'🔄 Recuperação (50+ dias)',
-  '30':'📈 Upgrade de plano','40':'⏫ Upgrade de duração','15':'⭐ Avaliação no Google',
+  '30':'📈 Upgrade de plano','40':'⏫ Upgrade duração (mensal→anual)','15':'⭐ Avaliação no Google',
   '25u':'➕ Upsell add-on','30r':'🛡️ Retenção (churn)','40i':'🤝 Indicação gerada','10a':'📅 Antecipação de renovação',
+  '30ts':'⏫ Upgrade duração (tri→sem)','30sa':'⏫ Upgrade duração (sem→anual)',
+  '20k':'💎 Plano acima de R$3k','40k':'💎 Plano acima de R$6k',
 };
-const ptsMap = {'50':50,'60':60,'30':30,'40':40,'15':15,'25u':25,'30r':30,'40i':40,'10a':10};
+const ptsMap = {'50':50,'60':60,'30':30,'40':40,'15':15,'25u':25,'30r':30,'40i':40,'10a':10,'30ts':30,'30sa':30,'20k':20,'40k':40};
 const titleMap = {
   '50':'⚡ Caçador(a) de Inativos','60':'🔄 Mestre da Ressurreição',
   '30':'📈 Sobe Patente','40':'⏫ Fidelizador(a)','40i':'🤝 Embaixador(a)',
   '15':'⭐ 5 Estrelas','25u':'➕ Rei/Rainha dos Upsells','30r':'🛡️ Muralha','10a':'📅 Antecipador(a)',
+  '30ts':'⏫ Fidelizador(a)','30sa':'⏫ Fidelizador(a)','20k':'💎 Ticket Alto','40k':'💎 Ticket Premium',
 };
 
 // KPI types que são puxados do histórico
