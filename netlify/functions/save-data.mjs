@@ -3,6 +3,7 @@ import { getStore } from "@netlify/blobs";
 const ptsMap = {
   '50':50,'60':60,'30':30,'40':40,'15':15,
   '25u':25,'30r':30,'40i':40,'10a':10,
+  '30ts':30,'30sa':30,'20k':20,'40k':40,
 };
 function resolvePoints(pts) { return ptsMap[String(pts)] ?? parseInt(pts) ?? 0; }
 
