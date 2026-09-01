@@ -340,7 +340,6 @@
     <p>Informe a data e os valores de receita e vendas do dia.</p>
     <input type="date" id="dayDate" />
     <input type="number" id="dayReceita" placeholder="Receita do dia (R$)" min="0" />
-    <input type="number" id="dayVendas" placeholder="Vendas do dia (qtd)" min="0" />
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('dayModal')">Cancelar</button>
       <button class="btn-confirm" id="btnConfirmDay" onclick="confirmDay()">Salvar</button>
@@ -612,23 +611,41 @@ function renderWeeks() {
 // KPIs — left sidebar
 function renderKPIs() {
   const history = state.history || [];
-  const metas = state.metas || { upsell:20, upgrade:30, receita:0, vendas:0 };
+  const weeks = state.weeks || [];
+  const metas = state.metas || { receita: 0 };
+
+  // Acumula histórico do mês atual: semana atual + semanas anteriores do mesmo mês
   const now = new Date();
   const mesAtual = now.getMonth();
   const anoAtual = now.getFullYear();
 
-  // Filter history for current month (all weeks merged via history)
-  // Use all history since weeks reset it — accumulate from weeks too
-  const allHistory = [...(state.history||[])];
-  // count from current week history
-  let upsellCount = allHistory.filter(h=>KPI_UPSELL_KEYS.includes(String(h.pts))).length;
-  let upgradeCount = allHistory.filter(h=>KPI_UPGRADE_KEYS.includes(String(h.pts))).length;
+  function isMesAtual(iso) {
+    if (!iso) return false;
+    const d = new Date(iso);
+    return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+  }
+
+  // Semana atual
+  let upsellCount = history.filter(h => KPI_UPSELL_KEYS.includes(String(h.pts))).length;
+  let upgradeCount = history.filter(h => KPI_UPGRADE_KEYS.includes(String(h.pts))).length;
+
+  // Semanas anteriores do mesmo mês
+  weeks.forEach(week => {
+    if (!week.closedAt || !isMesAtual(week.closedAt)) return;
+    (week.history || []).forEach(h => {
+      if (KPI_UPSELL_KEYS.includes(String(h.pts))) upsellCount++;
+      if (KPI_UPGRADE_KEYS.includes(String(h.pts))) upgradeCount++;
+    });
+  });
+
+  // Receita do mês via dailyHistory
+  const daily = state.dailyHistory || [];
+  const totalReceita = daily.reduce((s,d) => s + Number(d.receita||0), 0);
 
   const { uteis, decorridos } = diasUteisNoMes();
-  const fator = decorridos > 0 ? uteis/decorridos : 1;
-
-  function projVal(atual) { return Math.round(atual * fator); }
-  function pctVal(atual, meta) { return meta > 0 ? Math.min(Math.round((projVal(atual)/meta)*100),150) : 0; }
+  const fator = decorridos > 0 ? uteis / decorridos : 1;
+  const projReceita = Math.round(totalReceita * fator);
+  const pctReceita = metas.receita > 0 ? Math.min(Math.round((projReceita / metas.receita) * 100), 150) : 0;
   function barColor(p) { if(p>=90) return '#639922'; if(p>=60) return '#E8720C'; return '#CC0000'; }
   function badge(p) {
     if(p>=90) return '<span class="kpi-badge ok">No caminho</span>';
@@ -636,35 +653,30 @@ function renderKPIs() {
     return '<span class="kpi-badge risk">Em risco</span>';
   }
 
-  // Receita e vendas from dailyHistory
-  const daily = state.dailyHistory || [];
-  const totalReceita = daily.reduce((s,d)=>s+Number(d.receita||0),0);
-  const totalVendas = daily.reduce((s,d)=>s+Number(d.vendas||0),0);
-
-  const kpis = [
-    { label:'Upsells validados', icon:'ti-plus', atual:upsellCount, meta:metas.upsell, fmt:v=>v, unit:'' },
-    { label:'Upgrades validados', icon:'ti-trending-up', atual:upgradeCount, meta:metas.upgrade, fmt:v=>v, unit:'' },
-    { label:'Receita do mês', icon:'ti-currency-dollar', atual:totalReceita, meta:metas.receita, fmt:fmtBRL, unit:'R$' },
-    { label:'Vendas do mês', icon:'ti-chart-bar', atual:totalVendas, meta:metas.vendas, fmt:v=>v, unit:'' },
-  ];
-
   const mesNome = now.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
 
-  document.getElementById('kpiList').innerHTML = kpis.map(k=>{
-    const p = pctVal(k.atual, k.meta);
-    const proj = projVal(k.atual);
-    return `<div class="kpi-item">
-      <div class="kpi-label"><i class="ti ${k.icon}" style="font-size:13px"></i>${k.label}</div>
+  document.getElementById('kpiList').innerHTML = `
+    <div class="kpi-item">
+      <div class="kpi-label"><i class="ti ti-plus" style="font-size:13px"></i> Upsells — ${mesNome}</div>
+      <div class="kpi-value" style="font-size:28px">${upsellCount}</div>
+      <div class="kpi-meta" style="margin-top:2px">ações validadas no mês</div>
+    </div>
+    <div class="kpi-item">
+      <div class="kpi-label"><i class="ti ti-trending-up" style="font-size:13px"></i> Upgrades — ${mesNome}</div>
+      <div class="kpi-value" style="font-size:28px">${upgradeCount}</div>
+      <div class="kpi-meta" style="margin-top:2px">ações validadas no mês</div>
+    </div>
+    <div class="kpi-item" style="border-bottom:none;padding-bottom:0;margin-bottom:0">
+      <div class="kpi-label"><i class="ti ti-currency-dollar" style="font-size:13px"></i> Receita — ${mesNome}</div>
       <div class="kpi-row">
-        <div class="kpi-value">${k.fmt(k.atual)}</div>
-        <div class="kpi-meta">meta: ${k.fmt(k.meta)}</div>
+        <div class="kpi-value">${fmtBRL(totalReceita)}</div>
+        <div class="kpi-meta">meta: ${fmtBRL(metas.receita||0)}</div>
       </div>
-      <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:${Math.min(p,100)}%;background:${barColor(p)}"></div></div>
-      <div class="kpi-footer"><span>Projeção: ${k.fmt(proj)}</span><span>${p}%</span></div>
-      ${badge(p)}
-      <div class="month-label">${mesNome}</div>
-    </div>`;
-  }).join('');
+      <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:${Math.min(pctReceita,100)}%;background:${barColor(pctReceita)}"></div></div>
+      <div class="kpi-footer"><span>Projeção: ${fmtBRL(projReceita)}</span><span>${pctReceita}%</span></div>
+      ${metas.receita > 0 ? badge(pctReceita) : ''}
+    </div>
+  `;
 }
 
 // Daily history — right sidebar
@@ -738,23 +750,14 @@ async function deleteHistory(id) {
 function openMetaModal() {
   const metas=state.metas||{};
   document.getElementById('metaFields').innerHTML = `
-    <label style="font-size:12px;color:var(--text-muted)">Meta de upsells (mês)</label>
-    <input type="number" id="metaUpsell" value="${metas.upsell||0}" min="0" />
-    <label style="font-size:12px;color:var(--text-muted)">Meta de upgrades (mês)</label>
-    <input type="number" id="metaUpgrade" value="${metas.upgrade||0}" min="0" />
-    <label style="font-size:12px;color:var(--text-muted)">Meta de receita (R$)</label>
+    <label style="font-size:12px;color:var(--text-muted)">Meta de receita do mês (R$)</label>
     <input type="number" id="metaReceita" value="${metas.receita||0}" min="0" />
-    <label style="font-size:12px;color:var(--text-muted)">Meta de vendas (qtd)</label>
-    <input type="number" id="metaVendas" value="${metas.vendas||0}" min="0" />
   `;
 }
 
 async function confirmMeta() {
   const metas = {
-    upsell: parseInt(document.getElementById('metaUpsell').value)||0,
-    upgrade: parseInt(document.getElementById('metaUpgrade').value)||0,
     receita: parseFloat(document.getElementById('metaReceita').value)||0,
-    vendas: parseInt(document.getElementById('metaVendas').value)||0,
   };
   try { await saveData('update-metas',{metas}); state.metas=metas; closeModal('metaModal'); showToast('Metas salvas!'); renderKPIs(); }
   catch(e){showToast('Erro ao salvar metas.');}
