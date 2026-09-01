@@ -4,18 +4,13 @@ const ptsMap = {
   '50':50,'60':60,'30':30,'40':40,'15':15,
   '25u':25,'30r':30,'40i':40,'10a':10,
 };
-
-function resolvePoints(pts) {
-  return ptsMap[String(pts)] ?? parseInt(pts) ?? 0;
-}
+function resolvePoints(pts) { return ptsMap[String(pts)] ?? parseInt(pts) ?? 0; }
 
 export default async (req, context) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
-
   const body = await req.json();
   const { action, payload } = body;
   const store = getStore({ name: "painel-desafio", consistency: "strong" });
-
   const getItem = async (key, fallback) => {
     try { const raw = await store.get(key); return raw ? JSON.parse(raw) : fallback; }
     catch { return fallback; }
@@ -123,8 +118,9 @@ export default async (req, context) => {
     const { label } = payload;
     const points = await getItem("points", {});
     const validated = await getItem("validated", 0);
+    const history = await getItem("history", []);
     const weeks = await getItem("weeks", []);
-    weeks.unshift({ label, points: { ...points }, validated, closedAt: new Date().toISOString() });
+    weeks.unshift({ label, points: { ...points }, validated, history: [...history], closedAt: new Date().toISOString() });
     await store.set("weeks", JSON.stringify(weeks));
     await store.set("points", JSON.stringify({}));
     await store.set("validated", JSON.stringify(0));
