@@ -27,7 +27,15 @@
     /* Sidebar shared */
     .sidebar { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 1.5rem; }
     .sidebar-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
-    .sidebar-title { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .sidebar-title { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; background: var(--gc-dark); padding: 10px 14px; border-radius: var(--radius); gap: 8px; }
+    .sidebar-title span { color: #fff; display: flex; align-items: center; gap: 6px; }
+    .sidebar-title span i { color: rgba(255,255,255,0.7); }
+    .kpi-receita-card { background: var(--gc-dark); border-radius: var(--radius); padding: 12px 14px; margin-top: 4px; }
+    .kpi-receita-card .kpi-label { color: rgba(255,255,255,0.6); }
+    .kpi-receita-card .kpi-value { color: #fff; }
+    .kpi-receita-card .kpi-meta { color: rgba(255,255,255,0.5); }
+    .kpi-receita-card .kpi-bar-bg { background: rgba(255,255,255,0.15); }
+    .kpi-receita-card .kpi-footer { color: rgba(255,255,255,0.5); }
 
     /* KPI cards left sidebar */
     .kpi-item { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 0.5px solid var(--border); }
@@ -111,6 +119,16 @@
     .legend-tier-1 .legend-pts-num { color: #CC0000; }
     .legend-tier-2 { border-color: #E8720C; border-width: 1px; }
     .legend-tier-2 .legend-pts-num { color: #E8720C; }
+    .legend-tier-1 .legend-emoji { animation: pulse1 1.8s ease-in-out infinite; display: inline-block; }
+    .legend-tier-2 .legend-emoji { animation: pulse2 2.2s ease-in-out infinite; display: inline-block; }
+    @keyframes pulse1 {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(204,0,0,0)); }
+      50% { transform: scale(1.25); filter: drop-shadow(0 0 6px rgba(204,0,0,0.5)); }
+    }
+    @keyframes pulse2 {
+      0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 0px rgba(232,114,12,0)); }
+      50% { transform: scale(1.2) rotate(-8deg); filter: drop-shadow(0 0 5px rgba(232,114,12,0.45)); }
+    }
     .legend-emoji { font-size: 17px; flex-shrink: 0; }
     .legend-name { font-size: 12px; font-weight: 500; color: var(--text); }
     .legend-desc { font-size: 10px; color: var(--text-muted); }
@@ -154,6 +172,32 @@
     .spinning { animation: spin 1s linear infinite; }
     @keyframes spin { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
     .loading-overlay { display: flex; align-items: center; justify-content: center; padding: 1.5rem; color: var(--text-faint); font-size: 12px; gap: 6px; }
+
+    /* Countdown */
+    .countdown-bar { background: var(--gc-dark); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .countdown-label { font-size: 11px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 5px; }
+    .countdown-timer { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
+    .countdown-timer.urgent { color: #FF6B6B; animation: blink 1s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.6} }
+
+    /* Mensagem motivacional */
+    .motivational-bar { border-radius: var(--radius); padding: 10px 16px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #001636 0%, #002855 100%); border: 0.5px solid rgba(255,255,255,0.08); }
+    .motivational-text { font-size: 13px; color: #fff; flex: 1; font-style: italic; line-height: 1.4; }
+    .motivational-edit { font-size: 11px; padding: 3px 8px; border: 0.5px solid rgba(255,255,255,0.25); border-radius: var(--radius); background: transparent; color: rgba(255,255,255,0.6); cursor: pointer; display: none; white-space: nowrap; font-family: 'Inter', sans-serif; }
+    .motivational-edit:hover { background: rgba(255,255,255,0.1); }
+    .admin-mode .motivational-edit { display: flex; align-items: center; gap: 3px; }
+
+    /* Filtro histórico */
+    .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .filter-btn { font-size: 11px; padding: 4px 10px; border: 0.5px solid var(--border-md); border-radius: 20px; background: var(--surface); color: var(--text-muted); cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 4px; }
+    .filter-btn:hover { background: var(--surface2); }
+    .filter-btn.active { background: var(--gc-dark); color: #fff; border-color: var(--gc-dark); }
+
+    /* Campeão destaque nas semanas */
+    .week-champion { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: linear-gradient(135deg, #001636 0%, #002855 100%); border-radius: var(--radius); margin-bottom: 10px; }
+    .week-champion-crown { font-size: 18px; }
+    .week-champion-name { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; color: #fff; }
+    .week-champion-pts { font-family: 'Outfit', sans-serif; font-size: 12px; color: rgba(255,255,255,0.6); }
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,10,30,0.45); align-items: center; justify-content: center; z-index: 200; }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--surface); border: 0.5px solid var(--border-md); border-radius: var(--radius-lg); padding: 1.5rem; width: 400px; max-width: 92vw; box-shadow: 0 16px 48px rgba(0,0,0,0.18); }
@@ -191,8 +235,8 @@
   <div class="sidebar" id="leftSidebar">
     <div class="sidebar-card">
       <div class="sidebar-title">
-        <span><i class="ti ti-chart-bar" style="font-size:13px;margin-right:4px"></i>Indicadores do mês</span>
-        <button class="edit-meta-btn" onclick="openModal('metaModal')"><i class="ti ti-pencil" style="font-size:11px"></i> Editar metas</button>
+        <span><i class="ti ti-chart-bar" style="font-size:13px"></i>Indicadores do mês</span>
+        <button class="edit-meta-btn" onclick="openModal('metaModal')" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.3)"><i class="ti ti-pencil" style="font-size:11px"></i> Editar metas</button>
       </div>
       <div id="kpiList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i></div></div>
     </div>
@@ -204,6 +248,19 @@
       <div class="header-badge"><i class="ti ti-bolt" style="font-size:11px"></i> Desafio ativo</div>
       <h1>Força da Base<br>Operação Base Forte</h1>
       <p>Ranking atualizado em tempo real · Poste sua ação e aguarde validação</p>
+    </div>
+
+    <!-- Mensagem motivacional -->
+    <div class="motivational-bar" id="motivationalBar">
+      <i class="ti ti-speakerphone" style="font-size:16px;color:rgba(255,255,255,0.5);flex-shrink:0"></i>
+      <span class="motivational-text" id="motivationalText">Bora, time! Cada ação conta. 🚀</span>
+      <button class="motivational-edit" onclick="openModal('motivModal')"><i class="ti ti-pencil" style="font-size:11px"></i> Editar</button>
+    </div>
+
+    <!-- Countdown -->
+    <div class="countdown-bar">
+      <div class="countdown-label"><i class="ti ti-clock" style="font-size:13px"></i> Tempo para encerrar a semana</div>
+      <div class="countdown-timer" id="countdownTimer">—</div>
     </div>
 
     <div class="admin-bar">
@@ -252,6 +309,14 @@
     <div class="pending-list" id="pendingList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
 
     <div class="section-title" style="margin-top:1.25rem">Histórico da semana atual</div>
+    <div class="filter-bar" id="historyFilter">
+      <button class="filter-btn active" onclick="setFilter('all')" id="filter-all">Todos</button>
+      <button class="filter-btn" onclick="setFilter('jane')" id="filter-jane">Jane</button>
+      <button class="filter-btn" onclick="setFilter('lucas')" id="filter-lucas">Lucas</button>
+      <button class="filter-btn" onclick="setFilter('ana')" id="filter-ana">Ana Luiza</button>
+      <button class="filter-btn" onclick="setFilter('larissa')" id="filter-larissa">Larissa</button>
+      <button class="filter-btn" onclick="setFilter('arthur')" id="filter-arthur">Arthur</button>
+    </div>
     <div class="history-list" id="historyList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
 
     <div class="section-title" style="margin-top:1.25rem">Ações negadas</div>
@@ -276,6 +341,19 @@
 </div>
 
 <div class="overtake-toast" id="overtakeToast"></div>
+
+<!-- Modal mensagem motivacional -->
+<div class="modal-overlay" id="motivModal">
+  <div class="modal">
+    <h2>Mensagem motivacional</h2>
+    <p>Esta mensagem aparece no topo do painel para todo o time.</p>
+    <textarea id="motivText" rows="3" placeholder="Ex: Bora time! Cada ação conta. 🚀"></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('motivModal')">Cancelar</button>
+      <button class="btn-confirm" onclick="confirmMotiv()">Publicar</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal registrar ação -->
 <div class="modal-overlay" id="modalOverlay">
@@ -481,6 +559,7 @@ async function loadData(showRefresh=false) {
     detectOvertakes(newSorted);
     prevRanking=newSorted.map(([k])=>k);
     state={...state,...newState};
+    if (newState.motiv) document.getElementById('motivationalText').textContent = newState.motiv;
   } catch(e){console.error(e);}
   if (showRefresh){icon.classList.remove('spinning');showToast('Dados atualizados!');}
   renderRanking(); renderPending(); renderHistory(); renderDenied(); renderWeeks(); updateStats(); renderKPIs(); renderDailyHistory();
@@ -559,9 +638,9 @@ function renderPending() {
 }
 
 function renderHistory() {
-  const history=state.history||[];
-  const list=document.getElementById('historyList');
-  if (!history.length){list.innerHTML='<div class="empty-state">Nenhuma ação validada ainda nesta semana.</div>';return;}
+  const history = (state.history || []).filter(h => historyFilter === 'all' || h.playerKey === historyFilter);
+  const list = document.getElementById('historyList');
+  if (!history.length){list.innerHTML='<div class="empty-state">Nenhuma ação encontrada.</div>';return;}
   list.innerHTML=history.map(item=>{
     const p=playersMeta[item.playerKey]; if(!p) return '';
     const linkHtml=item.link?`<a href="${item.link}" target="_blank" rel="noopener" class="history-link"><i class="ti ti-external-link"></i> link</a>`:'';
@@ -602,6 +681,16 @@ function renderWeeks() {
     const pts=week.points||{};
     const sorted=Object.entries(playersMeta).sort((a,b)=>(pts[b[0]]||0)-(pts[a[0]]||0));
     const date=week.closedAt?new Date(week.closedAt).toLocaleDateString('pt-BR'):'';
+    const champion=sorted[0];
+    const championPts=pts[champion[0]]||0;
+    const championHtml=`<div class="week-champion">
+      <span class="week-champion-crown">🏆</span>
+      <div class="avatar ${champion[1].cls}" style="width:28px;height:28px;font-size:10px">${champion[1].av}</div>
+      <div>
+        <div class="week-champion-name">${champion[1].name}</div>
+        <div class="week-champion-pts">${championPts} pts · campeão da semana</div>
+      </div>
+    </div>`;
     const rows=sorted.map(([key,p],i)=>`
       <div class="week-ranking-row">
         <span style="font-size:16px;width:24px;text-align:center">${rankIcon(i+1)}</span>
@@ -611,10 +700,13 @@ function renderWeeks() {
       </div>`).join('');
     return `<div class="week-card">
       <div class="week-header" onclick="toggleWeek(${wi})">
-        <div><div class="week-label">${week.label||'Semana encerrada'}</div><div class="week-meta">${week.validated||0} ações · ${date}</div></div>
+        <div>
+          <div class="week-label">${week.label||'Semana encerrada'}</div>
+          <div class="week-meta">🏆 ${champion[1].name} · ${week.validated||0} ações · ${date}</div>
+        </div>
         <i class="ti ti-chevron-down" id="weekChevron${wi}"></i>
       </div>
-      <div class="week-body" id="weekBody${wi}">${rows}</div>
+      <div class="week-body" id="weekBody${wi}">${championHtml}${rows}</div>
     </div>`;
   }).join('');
 }
@@ -678,14 +770,16 @@ function renderKPIs() {
       <div class="kpi-meta" style="margin-top:2px">ações validadas no mês</div>
     </div>
     <div class="kpi-item" style="border-bottom:none;padding-bottom:0;margin-bottom:0">
-      <div class="kpi-label"><i class="ti ti-currency-dollar" style="font-size:13px"></i> Receita — ${mesNome}</div>
-      <div class="kpi-row">
-        <div class="kpi-value">${fmtBRL(totalReceita)}</div>
-        <div class="kpi-meta">meta: ${fmtBRL(metas.receita||0)}</div>
+      <div class="kpi-receita-card">
+        <div class="kpi-label"><i class="ti ti-currency-dollar" style="font-size:13px"></i> Receita — ${mesNome}</div>
+        <div class="kpi-row">
+          <div class="kpi-value">${fmtBRL(totalReceita)}</div>
+          <div class="kpi-meta">meta: ${fmtBRL(metas.receita||0)}</div>
+        </div>
+        <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:${Math.min(pctReceita,100)}%;background:${pctReceita>=90?'#639922':pctReceita>=60?'#E8720C':'#CC0000'}"></div></div>
+        <div class="kpi-footer"><span>Projeção: ${fmtBRL(projReceita)}</span><span>${pctReceita}%</span></div>
+        ${metas.receita > 0 ? badge(pctReceita) : ''}
       </div>
-      <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:${Math.min(pctReceita,100)}%;background:${barColor(pctReceita)}"></div></div>
-      <div class="kpi-footer"><span>Projeção: ${fmtBRL(projReceita)}</span><span>${pctReceita}%</span></div>
-      ${metas.receita > 0 ? badge(pctReceita) : ''}
     </div>
   `;
 }
@@ -875,9 +969,50 @@ function toggleWeek(i) {
   chevron.style.transform=body.classList.contains('open')?'rotate(180deg)':'';
 }
 
-['modalOverlay','denyModal','metaModal','dayModal','zeroDayModal','weekModal','editModal'].forEach(id=>{
+['modalOverlay','denyModal','metaModal','dayModal','zeroDayModal','weekModal','editModal','motivModal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeModal(id);});
 });
+
+let historyFilter = 'all';
+function setFilter(key) {
+  historyFilter = key;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`filter-${key}`).classList.add('active');
+  renderHistory();
+}
+
+// Countdown até sexta 18h
+function updateCountdown() {
+  const now = new Date();
+  const day = now.getDay();
+  let daysUntilFri = day <= 5 ? 5 - day : 6;
+  if (day === 5 && now.getHours() >= 18) daysUntilFri = 7;
+  const nextFri = new Date(now);
+  nextFri.setDate(now.getDate() + daysUntilFri);
+  nextFri.setHours(18, 0, 0, 0);
+  const diff = nextFri - now;
+  const timer = document.getElementById('countdownTimer');
+  if (diff <= 0) { timer.textContent = 'Semana encerrada!'; return; }
+  const d = Math.floor(diff/86400000);
+  const h = Math.floor((diff%86400000)/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  timer.textContent = d > 0 ? `${d}d ${h}h ${m}m` : h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
+  timer.className = 'countdown-timer' + (diff < 86400000 ? ' urgent' : '');
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// Mensagem motivacional
+async function confirmMotiv() {
+  const text = document.getElementById('motivText').value.trim();
+  if (!text) { showToast('Digite uma mensagem.'); return; }
+  try {
+    await saveData('update-motiv', { text });
+    document.getElementById('motivationalText').textContent = text;
+    closeModal('motivModal'); showToast('Mensagem publicada!');
+  } catch(e) { showToast('Erro ao salvar.'); }
+}
 
 loadData();
 setInterval(()=>loadData(),30000);
