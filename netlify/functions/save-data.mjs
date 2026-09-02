@@ -81,6 +81,11 @@ export default async (req, context) => {
     return Response.json({ ok: true });
   }
 
+  if (action === "update-motiv") {
+    await store.set("motiv", JSON.stringify(payload.text));
+    return Response.json({ ok: true });
+  }
+
   if (action === "update-metas") {
     await store.set("metas", JSON.stringify(payload.metas));
     return Response.json({ ok: true });
