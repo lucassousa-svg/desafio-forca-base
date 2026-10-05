@@ -173,6 +173,21 @@
     @keyframes spin { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
     .loading-overlay { display: flex; align-items: center; justify-content: center; padding: 1.5rem; color: var(--text-faint); font-size: 12px; gap: 6px; }
 
+    /* Duplicado badge */
+    .dup-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; background: #FEF3C7; color: #92400E; border: 0.5px solid #F59E0B; white-space: nowrap; display: flex; align-items: center; gap: 3px; }
+    .dup-warning { font-size: 11px; color: #92400E; background: #FEF3C7; border: 0.5px solid #F59E0B; border-radius: var(--radius); padding: 5px 10px; margin-bottom: 6px; }
+
+    /* Modalidades */
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border-radius: var(--radius); border: 0.5px solid var(--border); margin-top: 10px; }
+    .modal-cell { padding: 9px 12px; border-bottom: 0.5px solid var(--border); }
+    .modal-cell:nth-child(odd) { border-right: 0.5px solid var(--border); }
+    .modal-cell:nth-last-child(-n+2) { border-bottom: none; }
+    .modal-cell-label { font-size: 10px; color: var(--text-muted); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .modal-cell-value { font-size: 20px; font-weight: 500; }
+    .mv-tier1 { color: #CC0000; }
+    .mv-tier2 { color: #E8720C; }
+    .mv-normal { color: var(--text-primary); }
+
     /* Countdown */
     .countdown-bar { background: var(--gc-dark); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .countdown-label { font-size: 11px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 5px; }
@@ -239,6 +254,13 @@
         <button class="edit-meta-btn" onclick="openModal('metaModal')" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.3)"><i class="ti ti-pencil" style="font-size:11px"></i> Editar metas</button>
       </div>
       <div id="kpiList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i></div></div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-title">
+        <span><i class="ti ti-stack-2" style="font-size:13px"></i>Ações por modalidade</span>
+      </div>
+      <div id="modalidadesList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i></div></div>
     </div>
   </div>
 
@@ -384,7 +406,8 @@
       <option value="20k">💎 Plano acima de R$3k — 20 pts</option>
       <option value="40k">💎 Plano acima de R$6k — 40 pts</option>
     </select>
-    <input type="text" id="modalLink" placeholder="Link da intranet (obrigatório)" />
+    <input type="text" id="modalLink" placeholder="Link da intranet (obrigatório)" oninput="checkDuplicate(this.value)" />
+    <div id="dupWarning" class="dup-warning" style="display:none"></div>
     <div class="link-hint">Cole o link da intranet para que o administrador possa validar.</div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('modalOverlay')">Cancelar</button>
@@ -562,7 +585,7 @@ async function loadData(showRefresh=false) {
     if (newState.motiv) document.getElementById('motivationalText').textContent = newState.motiv;
   } catch(e){console.error(e);}
   if (showRefresh){icon.classList.remove('spinning');showToast('Dados atualizados!');}
-  renderRanking(); renderPending(); renderHistory(); renderDenied(); renderWeeks(); updateStats(); renderKPIs(); renderDailyHistory();
+  renderRanking(); renderPending(); renderHistory(); renderDenied(); renderWeeks(); updateStats(); renderKPIs(); renderDailyHistory(); renderModalidades();
   firstLoad=false;
 }
 
@@ -625,10 +648,12 @@ function renderPending() {
   list.innerHTML=pending.map(item=>{
     const p=playersMeta[item.playerKey]; if(!p) return '';
     const linkHtml=item.link?`<a href="${item.link}" target="_blank" rel="noopener" style="font-size:10px;color:#0268CD;text-decoration:none;white-space:nowrap;margin-right:3px;"><i class="ti ti-external-link" style="font-size:11px"></i> link</a>`:'';
-    return `<div class="pending-item" id="pend-${item.id}">
+    const dupCheck = item.link ? (state.history||[]).find(h=>h.link&&h.link.trim()===item.link.trim()) || (state.pending||[]).find(pp=>pp.id!==item.id&&pp.link&&pp.link.trim()===item.link.trim()) : null;
+    const dupBadge = dupCheck ? `<span class="dup-badge"><i class="ti ti-alert-triangle" style="font-size:10px"></i> Duplicado</span>` : '';
+    return `<div class="pending-item" id="pend-${item.id}" style="${dupCheck?'border-color:#F59E0B;background:#FFFBEB':''}">
       <div class="pending-avatar ${p.cls}">${p.av}</div>
       <div class="pending-name">${p.name} <span class="pending-action">— ${getLabel(item.pts)}</span></div>
-      ${linkHtml}
+      ${dupBadge}${linkHtml}
       <span class="pending-pts">+${getPoints(item.pts)} pts</span>
       <button class="action-btn green" onclick="validate('${item.id}','${item.playerKey}','${item.pts}')"><i class="ti ti-check"></i> Validar</button>
       <button class="action-btn red" onclick="openDenyModal('${item.id}')"><i class="ti ti-x"></i> Negar</button>
@@ -901,7 +926,7 @@ function openModal(id) {
 }
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
-  if (id==='modalOverlay'){document.getElementById('modalPlayer').value='';document.getElementById('modalAction').value='';document.getElementById('modalLink').value='';document.getElementById('btnConfirmAction').disabled=false;document.getElementById('btnConfirmAction').textContent='Enviar para validação';}
+  if (id==='modalOverlay'){document.getElementById('modalPlayer').value='';document.getElementById('modalAction').value='';document.getElementById('modalLink').value='';document.getElementById('btnConfirmAction').disabled=false;document.getElementById('btnConfirmAction').textContent='Enviar para validação';document.getElementById('dupWarning').style.display='none';}
   if (id==='weekModal'){document.getElementById('weekLabel').value='';document.getElementById('btnConfirmWeek').disabled=false;document.getElementById('btnConfirmWeek').innerHTML='<i class="ti ti-flag"></i> Encerrar e zerar';}
   if (id==='zeroDayModal'){document.getElementById('btnConfirmZeroDay').disabled=false;document.getElementById('btnConfirmZeroDay').innerHTML='<i class="ti ti-trash"></i> Zerar hoje';}
   if (id==='denyModal'){denyTarget=null;}
@@ -972,6 +997,79 @@ function toggleWeek(i) {
 ['modalOverlay','denyModal','metaModal','dayModal','zeroDayModal','weekModal','editModal','motivModal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeModal(id);});
 });
+
+// Detecção de links duplicados
+function checkDuplicate(link) {
+  const warn = document.getElementById('dupWarning');
+  if (!link || link.length < 10) { warn.style.display='none'; return; }
+  const allLinks = [
+    ...(state.pending||[]).map(p=>({link:p.link, name:playersMeta[p.playerKey]?.name||'', date:'pendente'})),
+    ...(state.history||[]).map(h=>({link:h.link, name:playersMeta[h.playerKey]?.name||'', date:fmtDate(h.validatedAt)})),
+  ];
+  const dup = allLinks.find(a => a.link && a.link.trim() === link.trim());
+  if (dup) {
+    warn.style.display='block';
+    warn.innerHTML=`<i class="ti ti-alert-triangle" style="font-size:12px"></i> Link já registrado por <strong>${dup.name}</strong> (${dup.date})`;
+  } else {
+    warn.style.display='none';
+  }
+}
+
+function isDuplicate(link) {
+  if (!link) return null;
+  const all = [
+    ...(state.pending||[]).map(p=>({link:p.link, name:playersMeta[p.playerKey]?.name||'', when:'pendente'})),
+    ...(state.history||[]).map(h=>({link:h.link, name:playersMeta[h.playerKey]?.name||'', when:fmtDate(h.validatedAt)})),
+  ];
+  return all.find(a => a.link && a.link.trim() === link.trim()) || null;
+}
+
+// Ações por modalidade
+function renderModalidades() {
+  const history = state.history || [];
+  const weeks = state.weeks || [];
+  const now = new Date();
+  const mes = now.getMonth(), ano = now.getFullYear();
+
+  function isMes(iso) {
+    if (!iso) return false;
+    const d = new Date(iso);
+    return d.getMonth()===mes && d.getFullYear()===ano;
+  }
+
+  const counts = {};
+  // semana atual
+  history.forEach(h => { const k=String(h.pts); counts[k]=(counts[k]||0)+1; });
+  // semanas anteriores do mês
+  weeks.forEach(w => {
+    if (!w.closedAt || !isMes(w.closedAt)) return;
+    (w.history||[]).forEach(h => { const k=String(h.pts); counts[k]=(counts[k]||0)+1; });
+  });
+
+  const items = [
+    { key:'60', label:'🔄 Recuperação', cls:'mv-tier1' },
+    { key:'50', label:'⚡ Reativação', cls:'mv-tier2' },
+    { key:'40i', label:'🤝 Indicação', cls:'mv-tier2' },
+    { key:'40', label:'⏫ Upg. duração (men→an)', cls:'mv-tier2' },
+    { key:'30ts', label:'⏫ Upg. dur. (tri→sem)', cls:'mv-normal' },
+    { key:'30sa', label:'⏫ Upg. dur. (sem→an)', cls:'mv-normal' },
+    { key:'30', label:'📈 Upgrade plano', cls:'mv-normal' },
+    { key:'25u', label:'➕ Upsell add-on', cls:'mv-normal' },
+    { key:'30r', label:'🛡️ Retenção', cls:'mv-normal' },
+    { key:'15', label:'⭐ Av. Google', cls:'mv-normal' },
+    { key:'10a', label:'📅 Antecipação', cls:'mv-normal' },
+    { key:'20k', label:'💎 Plano +3k', cls:'mv-normal' },
+    { key:'40k', label:'💎 Plano +6k', cls:'mv-tier2' },
+  ].filter(i => (counts[i.key]||0) > 0 || true);
+
+  const container = document.getElementById('modalidadesList');
+  const cells = items.map(i => `
+    <div class="modal-cell">
+      <div class="modal-cell-label">${i.label}</div>
+      <div class="modal-cell-value ${i.cls}">${counts[i.key]||0}</div>
+    </div>`).join('');
+  container.innerHTML = `<div class="modal-grid">${cells}</div>`;
+}
 
 let historyFilter = 'all';
 function setFilter(key) {
