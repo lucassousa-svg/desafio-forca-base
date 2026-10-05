@@ -137,10 +137,17 @@ export default async (req, context) => {
   }
 
   if (action === "close-month") {
-    const { label, counts, receita, meta, closedAt } = payload;
+    const { label, counts, receita, meta, ranking, closedAt } = payload;
     const monthHistory = await getItem("monthHistory", []);
-    monthHistory.unshift({ label, counts, receita, meta, closedAt });
+    monthHistory.unshift({ label, counts, receita, meta, ranking: ranking||[], closedAt });
     await store.set("monthHistory", JSON.stringify(monthHistory));
+    // Zera pontos, histórico semanal, receita diária e pendentes
+    await store.set("points", JSON.stringify({}));
+    await store.set("history", JSON.stringify([]));
+    await store.set("validated", JSON.stringify(0));
+    await store.set("dailyHistory", JSON.stringify([]));
+    await store.set("pending", JSON.stringify([]));
+    await store.set("denied", JSON.stringify([]));
     return Response.json({ ok: true });
   }
 
