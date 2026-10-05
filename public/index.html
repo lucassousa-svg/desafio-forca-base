@@ -174,8 +174,16 @@
     .loading-overlay { display: flex; align-items: center; justify-content: center; padding: 1.5rem; color: var(--text-faint); font-size: 12px; gap: 6px; }
 
     /* Duplicado badge */
-    .dup-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; background: #FEF3C7; color: #92400E; border: 0.5px solid #F59E0B; white-space: nowrap; display: flex; align-items: center; gap: 3px; }
+    .dup-badge { display: none; font-size: 10px; padding: 2px 7px; border-radius: 10px; background: #FEF3C7; color: #92400E; border: 0.5px solid #F59E0B; white-space: nowrap; display: flex; align-items: center; gap: 3px; }
     .dup-warning { font-size: 11px; color: #92400E; background: #FEF3C7; border: 0.5px solid #F59E0B; border-radius: var(--radius); padding: 5px 10px; margin-bottom: 6px; }
+
+    /* Collapsible sections */
+    .collapsible-header { display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; margin-bottom: 8px; cursor: pointer; user-select: none; }
+    .collapsible-header:hover .collapse-btn { color: var(--text-primary); }
+    .collapse-btn { font-size: 11px; color: var(--text-faint); background: none; border: 0.5px solid var(--border-md); border-radius: var(--radius); padding: 2px 8px; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 3px; transition: all 0.15s; }
+    .collapse-btn:hover { background: var(--surface2); }
+    .collapsible-body { overflow: hidden; transition: max-height 0.3s ease; }
+    .collapsible-body.collapsed { max-height: 0 !important; }
 
     /* Modalidades */
     .modal-grid { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border-radius: var(--radius); border: 0.5px solid var(--border); margin-top: 10px; }
@@ -187,6 +195,8 @@
     .mv-tier1 { color: #CC0000; }
     .mv-tier2 { color: #E8720C; }
     .mv-normal { color: var(--text-primary); }
+    .admin-mode .dup-badge { display: flex; }
+    .admin-mode .dup-item { border-color: #F59E0B !important; background: #FFFBEB !important; }
 
     /* Countdown */
     .countdown-bar { background: var(--gc-dark); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -253,6 +263,11 @@
         <span><i class="ti ti-chart-bar" style="font-size:13px"></i>Indicadores do mês</span>
         <button class="edit-meta-btn" onclick="openModal('metaModal')" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.3)"><i class="ti ti-pencil" style="font-size:11px"></i> Editar metas</button>
       </div>
+      <div style="margin-bottom:10px">
+        <select id="monthSelector" onchange="renderKPIs()" style="width:100%;font-size:12px;padding:5px 8px;border:0.5px solid var(--border-md);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;outline:none">
+          <option value="current">Mês atual</option>
+        </select>
+      </div>
       <div id="kpiList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i></div></div>
     </div>
 
@@ -302,6 +317,7 @@
       <div class="section-header-btns">
         <button class="admin-week-btn gray" onclick="openModal('zeroDayModal')"><i class="ti ti-trash"></i> Zerar hoje</button>
         <button class="admin-week-btn red" onclick="openModal('weekModal')"><i class="ti ti-flag"></i> Encerrar semana</button>
+        <button class="admin-week-btn red" style="border-color:#7F77DD;color:#7F77DD" onclick="openModal('monthModal')"><i class="ti ti-calendar-event"></i> Encerrar mês</button>
       </div>
     </div>
     <div class="card" id="rankingCard"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
@@ -317,7 +333,6 @@
       <div class="legend-item"><span class="legend-emoji">📈</span><div><div class="legend-name">Upgrade de plano</div><div class="legend-desc">Bronze → Prata etc.</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item"><span class="legend-emoji">➕</span><div><div class="legend-name">Upsell add-on</div><div class="legend-desc">Por cliente</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">25</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item"><span class="legend-emoji">🛡️</span><div><div class="legend-name">Retenção (churn)</div><div class="legend-desc">Cliente salvo</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item"><span class="legend-emoji">⭐</span><div><div class="legend-name">Avaliação no Google</div><div class="legend-desc">Por avaliação obtida</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">15</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item"><span class="legend-emoji">📅</span><div><div class="legend-name">Antecipação de renovação</div><div class="legend-desc">Antes do vencimento</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">10</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item"><span class="legend-emoji">💎</span><div><div class="legend-name">Plano acima de R$3k</div><div class="legend-desc">Por contrato fechado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">20</div><div class="legend-pts-lbl">pts</div></div></div>
       <div class="legend-item legend-tier-2"><span class="legend-emoji">💎</span><div><div class="legend-name">Plano acima de R$6k</div><div class="legend-desc">Por contrato fechado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
@@ -330,22 +345,37 @@
     </div>
     <div class="pending-list" id="pendingList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
 
-    <div class="section-title" style="margin-top:1.25rem">Histórico da semana atual</div>
-    <div class="filter-bar" id="historyFilter">
-      <button class="filter-btn active" onclick="setFilter('all')" id="filter-all">Todos</button>
-      <button class="filter-btn" onclick="setFilter('jane')" id="filter-jane">Jane</button>
-      <button class="filter-btn" onclick="setFilter('lucas')" id="filter-lucas">Lucas</button>
-      <button class="filter-btn" onclick="setFilter('ana')" id="filter-ana">Ana Luiza</button>
-      <button class="filter-btn" onclick="setFilter('larissa')" id="filter-larissa">Larissa</button>
-      <button class="filter-btn" onclick="setFilter('arthur')" id="filter-arthur">Arthur</button>
+    <div class="collapsible-header" onclick="toggleSection('historySection','historyChevron')">
+      <div class="section-title" style="margin-top:0;margin-bottom:0">Histórico da semana atual</div>
+      <button class="collapse-btn" id="historyChevron"><i class="ti ti-chevron-up" style="font-size:12px"></i> Minimizar</button>
     </div>
-    <div class="history-list" id="historyList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
+    <div class="collapsible-body" id="historySection" style="max-height:2000px">
+      <div class="filter-bar" id="historyFilter">
+        <button class="filter-btn active" onclick="setFilter('all')" id="filter-all">Todos</button>
+        <button class="filter-btn" onclick="setFilter('jane')" id="filter-jane">Jane</button>
+        <button class="filter-btn" onclick="setFilter('lucas')" id="filter-lucas">Lucas</button>
+        <button class="filter-btn" onclick="setFilter('ana')" id="filter-ana">Ana Luiza</button>
+        <button class="filter-btn" onclick="setFilter('larissa')" id="filter-larissa">Larissa</button>
+        <button class="filter-btn" onclick="setFilter('arthur')" id="filter-arthur">Arthur</button>
+      </div>
+      <div class="history-list" id="historyList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
+    </div>
 
-    <div class="section-title" style="margin-top:1.25rem">Ações negadas</div>
-    <div class="denied-list" id="deniedList"><div class="empty-state">Nenhuma ação negada.</div></div>
+    <div class="collapsible-header" onclick="toggleSection('deniedSection','deniedChevron')">
+      <div class="section-title" style="margin-top:0;margin-bottom:0">Ações negadas</div>
+      <button class="collapse-btn" id="deniedChevron"><i class="ti ti-chevron-up" style="font-size:12px"></i> Minimizar</button>
+    </div>
+    <div class="collapsible-body" id="deniedSection" style="max-height:2000px">
+      <div class="denied-list" id="deniedList"><div class="empty-state">Nenhuma ação negada.</div></div>
+    </div>
 
-    <div class="section-title" style="margin-top:1.25rem">Semanas anteriores</div>
-    <div id="weeksList"><div class="empty-state">Nenhuma semana encerrada ainda.</div></div>
+    <div class="collapsible-header" onclick="toggleSection('weeksSection','weeksChevron')">
+      <div class="section-title" style="margin-top:0;margin-bottom:0">Semanas anteriores</div>
+      <button class="collapse-btn" id="weeksChevron"><i class="ti ti-chevron-up" style="font-size:12px"></i> Minimizar</button>
+    </div>
+    <div class="collapsible-body" id="weeksSection" style="max-height:2000px">
+      <div id="weeksList"><div class="empty-state">Nenhuma semana encerrada ainda.</div></div>
+    </div>
   </div>
 
   <!-- RIGHT SIDEBAR: Histórico diário de receita/vendas -->
@@ -398,7 +428,6 @@
       <option value="40">⏫ Upgrade de duração (mensal → anual) — 40 pts</option>
       <option value="30ts">⏫ Upgrade de duração (trimestral → semestral) — 30 pts</option>
       <option value="30sa">⏫ Upgrade de duração (semestral → anual) — 30 pts</option>
-      <option value="15">⭐ Avaliação no Google — 15 pts</option>
       <option value="25u">➕ Upsell add-on — 25 pts</option>
       <option value="30r">🛡️ Retenção (churn) — 30 pts</option>
       <option value="40i">🤝 Indicação gerada — 40 pts</option>
@@ -468,6 +497,19 @@
   </div>
 </div>
 
+<!-- Modal encerrar mês -->
+<div class="modal-overlay" id="monthModal">
+  <div class="modal">
+    <h2>Encerrar mês</h2>
+    <p>Salva o snapshot completo do mês atual (indicadores, modalidades, receita) para consulta futura. Os dados da semana atual não são zerados.</p>
+    <input type="text" id="monthLabel" placeholder="Nome do mês (ex: Setembro 2026)" />
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('monthModal')">Cancelar</button>
+      <button class="btn-danger" id="btnConfirmMonth" onclick="confirmCloseMonth()" style="background:#7F77DD"><i class="ti ti-calendar-event"></i> Salvar snapshot</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal encerrar semana -->
 <div class="modal-overlay" id="weekModal">
   <div class="modal">
@@ -514,16 +556,15 @@ const playersMeta = {
 };
 const actionLabels = {
   '50':'⚡ Reativação (30+ dias)','60':'🔄 Recuperação (50+ dias)',
-  '30':'📈 Upgrade de plano','40':'⏫ Upgrade duração (mensal→anual)','15':'⭐ Avaliação no Google',
   '25u':'➕ Upsell add-on','30r':'🛡️ Retenção (churn)','40i':'🤝 Indicação gerada','10a':'📅 Antecipação de renovação',
   '30ts':'⏫ Upgrade duração (tri→sem)','30sa':'⏫ Upgrade duração (sem→anual)',
   '20k':'💎 Plano acima de R$3k','40k':'💎 Plano acima de R$6k',
 };
-const ptsMap = {'50':50,'60':60,'30':30,'40':40,'15':15,'25u':25,'30r':30,'40i':40,'10a':10,'30ts':30,'30sa':30,'20k':20,'40k':40};
+const ptsMap = {'50':50,'60':60,'30':30,'40':40,'25u':25,'30r':30,'40i':40,'10a':10,'30ts':30,'30sa':30,'20k':20,'40k':40};
 const titleMap = {
   '50':'⚡ Caçador(a) de Inativos','60':'🔄 Mestre da Ressurreição',
   '30':'📈 Sobe Patente','40':'⏫ Fidelizador(a)','40i':'🤝 Embaixador(a)',
-  '15':'⭐ 5 Estrelas','25u':'➕ Rei/Rainha dos Upsells','30r':'🛡️ Muralha','10a':'📅 Antecipador(a)',
+  '25u':'➕ Rei/Rainha dos Upsells','30r':'🛡️ Muralha','10a':'📅 Antecipador(a)',
   '30ts':'⏫ Fidelizador(a)','30sa':'⏫ Fidelizador(a)','20k':'💎 Ticket Alto','40k':'💎 Ticket Premium',
 };
 
@@ -585,6 +626,7 @@ async function loadData(showRefresh=false) {
     if (newState.motiv) document.getElementById('motivationalText').textContent = newState.motiv;
   } catch(e){console.error(e);}
   if (showRefresh){icon.classList.remove('spinning');showToast('Dados atualizados!');}
+  populateMonthSelector();
   renderRanking(); renderPending(); renderHistory(); renderDenied(); renderWeeks(); updateStats(); renderKPIs(); renderDailyHistory(); renderModalidades();
   firstLoad=false;
 }
@@ -650,7 +692,7 @@ function renderPending() {
     const linkHtml=item.link?`<a href="${item.link}" target="_blank" rel="noopener" style="font-size:10px;color:#0268CD;text-decoration:none;white-space:nowrap;margin-right:3px;"><i class="ti ti-external-link" style="font-size:11px"></i> link</a>`:'';
     const dupCheck = item.link ? (state.history||[]).find(h=>h.link&&h.link.trim()===item.link.trim()) || (state.pending||[]).find(pp=>pp.id!==item.id&&pp.link&&pp.link.trim()===item.link.trim()) : null;
     const dupBadge = dupCheck ? `<span class="dup-badge"><i class="ti ti-alert-triangle" style="font-size:10px"></i> Duplicado</span>` : '';
-    return `<div class="pending-item" id="pend-${item.id}" style="${dupCheck?'border-color:#F59E0B;background:#FFFBEB':''}">
+    return `<div class="pending-item ${dupCheck?'dup-item':''}" id="pend-${item.id}">
       <div class="pending-avatar ${p.cls}">${p.av}</div>
       <div class="pending-name">${p.name} <span class="pending-action">— ${getLabel(item.pts)}</span></div>
       ${dupBadge}${linkHtml}
@@ -738,6 +780,37 @@ function renderWeeks() {
 
 // KPIs — left sidebar
 function renderKPIs() {
+  const sel = document.getElementById('monthSelector');
+  const selVal = sel ? sel.value : 'current';
+
+  // Mês anterior selecionado
+  if (selVal !== 'current') {
+    const monthSnap = (state.monthHistory||[])[parseInt(selVal)];
+    if (monthSnap) {
+      const pctR = monthSnap.meta > 0 ? Math.min(Math.round((monthSnap.receita/monthSnap.meta)*100),150) : 0;
+      function barColor(p){if(p>=90)return'#639922';if(p>=60)return'#E8720C';return'#CC0000';}
+      function badge(p){if(p>=90)return'<span class="kpi-badge ok">Atingido</span>';if(p>=60)return'<span class="kpi-badge warn">Parcial</span>';return'<span class="kpi-badge risk">Não atingido</span>';}
+      document.getElementById('kpiList').innerHTML = `
+        <div class="kpi-item"><div class="kpi-label">Receita do mês</div>
+          <div class="kpi-row"><div class="kpi-value">${fmtBRL(monthSnap.receita)}</div><div class="kpi-meta">meta: ${fmtBRL(monthSnap.meta)}</div></div>
+          <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:${Math.min(pctR,100)}%;background:${barColor(pctR)}"></div></div>
+          <div class="kpi-footer"><span>${pctR}%</span></div>${monthSnap.meta>0?badge(pctR):''}
+        </div>`;
+      // modalidades do mês histórico
+      const counts = monthSnap.counts || {};
+      const items = [
+        {key:'60',label:'🔄 Recuperação',cls:'mv-tier1'},{key:'50',label:'⚡ Reativação',cls:'mv-tier2'},
+        {key:'40i',label:'🤝 Indicação',cls:'mv-tier2'},{key:'40',label:'⏫ Upg. duração',cls:'mv-tier2'},
+        {key:'30ts',label:'⏫ Tri→Sem',cls:'mv-normal'},{key:'30sa',label:'⏫ Sem→An',cls:'mv-normal'},
+        {key:'30',label:'📈 Upgrade plano',cls:'mv-normal'},{key:'25u',label:'➕ Upsell',cls:'mv-normal'},
+        {key:'30r',label:'🛡️ Retenção',cls:'mv-normal'},{key:'10a',label:'📅 Antecipação',cls:'mv-normal'},
+        {key:'20k',label:'💎 Plano +3k',cls:'mv-normal'},{key:'40k',label:'💎 Plano +6k',cls:'mv-tier2'},
+      ];
+      document.getElementById('modalidadesList').innerHTML = `<div class="modal-grid">${items.map(i=>`<div class="modal-cell"><div class="modal-cell-label">${i.label}</div><div class="modal-cell-value ${i.cls}">${counts[i.key]||0}</div></div>`).join('')}</div>`;
+      return;
+    }
+  }
+
   const history = state.history || [];
   const weeks = state.weeks || [];
   const metas = state.metas || { receita: 0 };
@@ -928,6 +1001,7 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('open');
   if (id==='modalOverlay'){document.getElementById('modalPlayer').value='';document.getElementById('modalAction').value='';document.getElementById('modalLink').value='';document.getElementById('btnConfirmAction').disabled=false;document.getElementById('btnConfirmAction').textContent='Enviar para validação';document.getElementById('dupWarning').style.display='none';}
   if (id==='weekModal'){document.getElementById('weekLabel').value='';document.getElementById('btnConfirmWeek').disabled=false;document.getElementById('btnConfirmWeek').innerHTML='<i class="ti ti-flag"></i> Encerrar e zerar';}
+  if (id==='monthModal'){document.getElementById('monthLabel').value='';}
   if (id==='zeroDayModal'){document.getElementById('btnConfirmZeroDay').disabled=false;document.getElementById('btnConfirmZeroDay').innerHTML='<i class="ti ti-trash"></i> Zerar hoje';}
   if (id==='denyModal'){denyTarget=null;}
   if (id==='editModal'){editTarget=null;editOp='add';document.getElementById('editPtsValue').value='';document.querySelectorAll('.edit-op-btn').forEach(b=>b.classList.remove('selected'));document.getElementById('opAdd').classList.add('selected');document.getElementById('btnConfirmEdit').disabled=false;document.getElementById('btnConfirmEdit').textContent='Salvar';}
@@ -994,7 +1068,57 @@ function toggleWeek(i) {
   chevron.style.transform=body.classList.contains('open')?'rotate(180deg)':'';
 }
 
-['modalOverlay','denyModal','metaModal','dayModal','zeroDayModal','weekModal','editModal','motivModal'].forEach(id=>{
+async function confirmCloseMonth() {
+  const label = document.getElementById('monthLabel').value.trim();
+  if (!label) { showToast('Digite o nome do mês.'); return; }
+  const btn = document.getElementById('btnConfirmMonth');
+  btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader spinning"></i> Salvando...';
+
+  const history = state.history || [];
+  const weeks = state.weeks || [];
+  const metas = state.metas || {};
+  const dailyHistory = state.dailyHistory || [];
+  const now = new Date();
+  const mes = now.getMonth(), ano = now.getFullYear();
+
+  function isMes(iso) {
+    if (!iso) return false;
+    const d = new Date(iso);
+    return d.getMonth()===mes && d.getFullYear()===ano;
+  }
+
+  const counts = {};
+  history.forEach(h => { const k=String(h.pts); counts[k]=(counts[k]||0)+1; });
+  weeks.forEach(w => {
+    if (!w.closedAt || !isMes(w.closedAt)) return;
+    (w.history||[]).forEach(h => { const k=String(h.pts); counts[k]=(counts[k]||0)+1; });
+  });
+  const totalReceita = dailyHistory.reduce((s,d)=>s+Number(d.receita||0),0);
+
+  try {
+    await saveData('close-month', { label, counts, receita: totalReceita, meta: metas.receita||0, closedAt: now.toISOString() });
+    closeModal('monthModal');
+    showToast('Snapshot do mês salvo!');
+    await loadData();
+  } catch(e) { showToast('Erro ao salvar.'); }
+  btn.disabled = false; btn.innerHTML = '<i class="ti ti-calendar-event"></i> Salvar snapshot';
+}
+
+function populateMonthSelector() {
+  const months = state.monthHistory || [];
+  const sel = document.getElementById('monthSelector');
+  const current = sel.value;
+  sel.innerHTML = '<option value="current">Mês atual</option>';
+  months.forEach((m, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = m.label;
+    sel.appendChild(opt);
+  });
+  sel.value = current && sel.querySelector(`option[value="${current}"]`) ? current : 'current';
+}
+
+['modalOverlay','denyModal','metaModal','dayModal','zeroDayModal','weekModal','monthModal','editModal','motivModal'].forEach(id=>{
   document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeModal(id);});
 });
 
@@ -1056,7 +1180,6 @@ function renderModalidades() {
     { key:'30', label:'📈 Upgrade plano', cls:'mv-normal' },
     { key:'25u', label:'➕ Upsell add-on', cls:'mv-normal' },
     { key:'30r', label:'🛡️ Retenção', cls:'mv-normal' },
-    { key:'15', label:'⭐ Av. Google', cls:'mv-normal' },
     { key:'10a', label:'📅 Antecipação', cls:'mv-normal' },
     { key:'20k', label:'💎 Plano +3k', cls:'mv-normal' },
     { key:'40k', label:'💎 Plano +6k', cls:'mv-tier2' },
@@ -1069,6 +1192,21 @@ function renderModalidades() {
       <div class="modal-cell-value ${i.cls}">${counts[i.key]||0}</div>
     </div>`).join('');
   container.innerHTML = `<div class="modal-grid">${cells}</div>`;
+}
+
+function toggleSection(sectionId, chevronId) {
+  const section = document.getElementById(sectionId);
+  const btn = document.getElementById(chevronId);
+  const isCollapsed = section.classList.contains('collapsed');
+  if (isCollapsed) {
+    section.classList.remove('collapsed');
+    section.style.maxHeight = '2000px';
+    btn.innerHTML = '<i class="ti ti-chevron-up" style="font-size:12px"></i> Minimizar';
+  } else {
+    section.classList.add('collapsed');
+    section.style.maxHeight = '0';
+    btn.innerHTML = '<i class="ti ti-chevron-down" style="font-size:12px"></i> Expandir';
+  }
 }
 
 let historyFilter = 'all';
