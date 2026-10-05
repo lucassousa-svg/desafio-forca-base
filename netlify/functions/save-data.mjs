@@ -1,7 +1,7 @@
 import { getStore } from "@netlify/blobs";
 
 const ptsMap = {
-  '50':50,'60':60,'30':30,'40':40,'15':15,
+  '50':50,'60':60,'30':30,'40':40,
   '25u':25,'30r':30,'40i':40,'10a':10,
   '30ts':30,'30sa':30,'20k':20,'40k':40,
 };
@@ -92,11 +92,11 @@ export default async (req, context) => {
   }
 
   if (action === "add-daily") {
-    const { date, receita, vendas } = payload;
+    const { date, receita } = payload;
     const daily = await getItem("dailyHistory", []);
     const idx = daily.findIndex(d => d.date === date);
-    if (idx >= 0) daily[idx] = { date, receita, vendas };
-    else daily.push({ date, receita, vendas });
+    if (idx >= 0) daily[idx] = { date, receita };
+    else daily.push({ date, receita });
     await store.set("dailyHistory", JSON.stringify(daily));
     return Response.json({ ok: true });
   }
@@ -133,6 +133,14 @@ export default async (req, context) => {
     await store.set("history", JSON.stringify([]));
     await store.set("pending", JSON.stringify([]));
     await store.set("denied", JSON.stringify([]));
+    return Response.json({ ok: true });
+  }
+
+  if (action === "close-month") {
+    const { label, counts, receita, meta, closedAt } = payload;
+    const monthHistory = await getItem("monthHistory", []);
+    monthHistory.unshift({ label, counts, receita, meta, closedAt });
+    await store.set("monthHistory", JSON.stringify(monthHistory));
     return Response.json({ ok: true });
   }
 
