@@ -502,7 +502,7 @@
 <div class="modal-overlay" id="monthModal">
   <div class="modal">
     <h2>Encerrar mês</h2>
-    <p>Salva o snapshot completo do mês atual (indicadores, modalidades, receita) para consulta futura. Os dados da semana atual não são zerados.</p>
+    <p>Salva o ranking, modalidades e receita do mês atual para consulta futura e <strong>zera os pontos, histórico e receita diária</strong> para começar o próximo mês. Esta ação não pode ser desfeita.</p>
     <input type="text" id="monthLabel" placeholder="Nome do mês (ex: Setembro 2026)" />
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('monthModal')">Cancelar</button>
@@ -808,9 +808,35 @@ function renderKPIs() {
         {key:'20k',label:'💎 Plano +3k',cls:'mv-normal'},{key:'40k',label:'💎 Plano +6k',cls:'mv-tier2'},
       ];
       document.getElementById('modalidadesList').innerHTML = `<div class="modal-grid">${items.map(i=>`<div class="modal-cell"><div class="modal-cell-label">${i.label}</div><div class="modal-cell-value ${i.cls}">${counts[i.key]||0}</div></div>`).join('')}</div>`;
+
+      // Ranking do mês
+      const ranking = monthSnap.ranking || [];
+      if (ranking.length) {
+        const rankHtml = ranking.map((r,i)=>{
+          const p = playersMeta[r.key]; if(!p) return '';
+          const icons = ['🥇','🥈','🥉'];
+          return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border)">
+            <span style="font-size:16px;width:22px;text-align:center">${icons[i]||i+1}</span>
+            <div class="avatar ${p.cls}" style="width:26px;height:26px;font-size:9px">${p.av}</div>
+            <div style="font-size:12px;font-weight:500;flex:1">${p.name}</div>
+            <span style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:700">${r.pts} pts</span>
+          </div>`;
+        }).join('');
+        const existingRank = document.getElementById('monthRankingEl');
+        if (existingRank) existingRank.remove();
+        const rankCard = document.createElement('div');
+        rankCard.id = 'monthRankingEl';
+        rankCard.style.cssText = 'background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:10px 14px;margin-top:10px';
+        rankCard.innerHTML = `<div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🏆 Ranking do mês</div>${rankHtml}`;
+        document.getElementById('modalidadesList').after(rankCard);
+      }
       return;
     }
   }
+
+  // Limpar ranking de mês anterior se voltou para atual
+  const existingRankEl = document.getElementById('monthRankingEl');
+  if (existingRankEl) existingRankEl.remove();
 
   const history = state.history || [];
   const weeks = state.weeks || [];
@@ -1096,10 +1122,16 @@ async function confirmCloseMonth() {
   });
   const totalReceita = dailyHistory.reduce((s,d)=>s+Number(d.receita||0),0);
 
+  // Snapshot do ranking atual + semanas do mês
+  const ranking = Object.entries(state.points||{}).map(([key,pts])=>({key,pts})).sort((a,b)=>b.pts-a.pts);
+
   try {
-    await saveData('close-month', { label, counts, receita: totalReceita, meta: metas.receita||0, closedAt: now.toISOString() });
+    await saveData('close-month', {
+      label, counts, receita: totalReceita, meta: metas.receita||0,
+      ranking, closedAt: now.toISOString()
+    });
     closeModal('monthModal');
-    showToast('Snapshot do mês salvo!');
+    showToast('Mês encerrado e zerado!');
     await loadData();
   } catch(e) { showToast('Erro ao salvar.'); }
   btn.disabled = false; btn.innerHTML = '<i class="ti ti-calendar-event"></i> Salvar snapshot';
