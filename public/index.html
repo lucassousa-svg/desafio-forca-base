@@ -100,14 +100,14 @@
     .rank-n { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-faint); text-align: center; }
     .player-cell { display: flex; align-items: center; gap: 8px; }
     .avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; flex-shrink: 0; }
-    .av-jane{background:#E6F1FB;color:#0C447C} .av-lucas{background:#EAF3DE;color:#27500A} .av-ana{background:#FAECE7;color:#712B13} .av-larissa{background:#EEEDFE;color:#3C3489} .av-arthur{background:#FEF0E6;color:#93340A}
+    .av-jane{background:#E6F1FB;color:#0C447C} .av-lucas{background:#EAF3DE;color:#27500A} .av-ana{background:#FAECE7;color:#712B13} .av-larissa{background:#EEEDFE;color:#3C3489} .av-arthur{background:#FEF0E6;color:#93340A} .av-breno{background:#DDEEDD;color:#145214} .av-evelyn{background:#EDE0F5;color:#5B2D8E}
     .player-name { font-size: 13px; font-weight: 500; color: var(--text); }
     .player-alias { font-size: 10px; color: var(--text-muted); background: var(--surface2); padding: 1px 6px; border-radius: 8px; display: inline-block; margin-top: 1px; }
     .player-title { font-size: 10px; color: var(--gc-red); font-weight: 500; margin-top: 1px; display: block; }
     .bar-wrap { display: flex; align-items: center; }
     .bar-bg { flex: 1; background: var(--surface2); border-radius: 4px; height: 5px; overflow: hidden; }
     .bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
-    .bar-jane{background:#378ADD} .bar-lucas{background:#639922} .bar-ana{background:#D85A30} .bar-larissa{background:#7F77DD} .bar-arthur{background:#E8720C}
+    .bar-jane{background:#378ADD} .bar-lucas{background:#639922} .bar-ana{background:#D85A30} .bar-larissa{background:#7F77DD} .bar-arthur{background:#E8720C} .bar-breno{background:#2D8A2D} .bar-evelyn{background:#9B59D0}
     .points-cell { text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
     .points-big { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); }
     .points-label { font-size: 10px; color: var(--text-faint); }
@@ -358,6 +358,8 @@
         <button class="filter-btn" onclick="setFilter('ana')" id="filter-ana">Ana Luiza</button>
         <button class="filter-btn" onclick="setFilter('larissa')" id="filter-larissa">Larissa</button>
         <button class="filter-btn" onclick="setFilter('arthur')" id="filter-arthur">Arthur</button>
+      <button class="filter-btn" onclick="setFilter('breno')" id="filter-breno">Breno</button>
+      <button class="filter-btn" onclick="setFilter('evelyn')" id="filter-evelyn">Evelyn</button>
       </div>
       <div class="history-list" id="historyList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
     </div>
@@ -420,6 +422,8 @@
       <option value="ana">Ana Luiza (Incendiária)</option>
       <option value="larissa">Larissa (BOPE)</option>
       <option value="arthur">Arthur (Aspira)</option>
+      <option value="breno">Breno (B2)</option>
+      <option value="evelyn">Evelyn (Eve)</option>
     </select>
     <select id="modalAction">
       <option value="">Tipo de ação...</option>
@@ -554,6 +558,8 @@ const playersMeta = {
   ana:     { name:'Ana Luiza',   alias:'Incendiária', av:'AL', cls:'av-ana',     bar:'bar-ana'     },
   larissa: { name:'Larissa',     alias:'BOPE',        av:'LA', cls:'av-larissa', bar:'bar-larissa' },
   arthur:  { name:'Arthur',      alias:'Aspira',      av:'AR', cls:'av-arthur',  bar:'bar-arthur'  },
+  breno:   { name:'Breno',       alias:'B2',          av:'BR', cls:'av-breno',   bar:'bar-breno'   },
+  evelyn:  { name:'Evelyn',      alias:'Eve',         av:'EV', cls:'av-evelyn',  bar:'bar-evelyn'  },
 };
 const actionLabels = {
   '50':'⚡ Reativação (30+ dias)','60':'🔄 Recuperação (50+ dias)',
