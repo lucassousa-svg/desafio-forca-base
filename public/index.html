@@ -56,14 +56,14 @@ h1{font-family:'Outfit',sans-serif;font-size:26px;font-weight:700;color:#fff;lin
 .cs{font-size:12px;color:var(--fa)}
 .side{display:flex;flex-direction:column;gap:14px}
 /* podium */
-.pod{display:flex;align-items:flex-end;justify-content:center;gap:10px;height:150px;margin:4px 0 10px}
+.pod{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:10px 0 12px}
 .pc{display:flex;flex-direction:column;align-items:center;gap:3px;width:30%;max-width:150px}
 .pc .nm{font-size:12px;font-weight:500;text-align:center}
 .pb{width:100%;border-radius:10px 10px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:6px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700}
 .crown{font-size:20px;color:#C8950A;animation:fl 2s ease-in-out infinite}
 @keyframes fl{50%{transform:translateY(-3px)}}
 /* ranking */
-.rw{display:grid;grid-template-columns:30px 36px minmax(0,1fr) 90px 82px;align-items:center;gap:10px;padding:10px 4px;border-top:.5px solid var(--bd);transition:background .15s}
+.rw{display:grid;grid-template-columns:30px 36px minmax(0,1fr) minmax(56px,100px) 138px;align-items:center;gap:10px;padding:10px 4px;border-top:.5px solid var(--bd);transition:background .15s}
 .rw:hover{background:var(--sf2)}
 .rn{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--fa);text-align:center}
 .av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;flex-shrink:0}
@@ -75,10 +75,12 @@ h1{font-family:'Outfit',sans-serif;font-size:26px;font-weight:700;color:#fff;lin
 .bar{height:6px;background:var(--sf2);border-radius:4px;overflow:hidden}
 .bar i{display:block;height:100%;border-radius:4px;transition:width .8s ease}
 .b-jane{background:#378ADD}.b-lucas{background:#639922}.b-ana{background:#D85A30}.b-larissa{background:#7F77DD}.b-arthur{background:#E8720C}.b-breno{background:#2D8A2D}.b-evelyn{background:#9B59D0}
-.pp{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+.pp{display:flex;align-items:center;justify-content:flex-end;gap:8px;white-space:nowrap}
+.pv{display:inline-flex;align-items:baseline;gap:3px}
 .pp b{font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
 .pp small{font-size:11px;color:var(--fa)}
-@media(max-width:560px){.rw{grid-template-columns:24px 32px minmax(0,1fr) 70px}.rw .bar{display:none}}
+.pt{line-height:1.4}
+@media(max-width:560px){.rw{grid-template-columns:24px 32px minmax(0,1fr) auto}.rw .bar{display:none}}
 /* side cards */
 .big{font-family:'Outfit',sans-serif;font-size:26px;font-weight:700;line-height:1.1}
 .mu{font-size:12px;color:var(--mu)}
@@ -207,22 +209,22 @@ summary b{font-family:'Outfit',sans-serif;font-size:14px;font-weight:600}
 <script>
 const ADMIN_PASS='2355';
 const PL={
-  jane:{n:'Jane',a:'camisa 10',i:'JA'},lucas:{n:'Lucas Neiva',a:'Mineirinho',i:'LN'},ana:{n:'Ana Luiza',a:'Incendiária',i:'AL'},
-  larissa:{n:'Larissa',a:'BOPE',i:'LA'},arthur:{n:'Arthur',a:'Cocoricó',i:'AR'},breno:{n:'Breno',a:'Sangue nos zói',i:'BR'},evelyn:{n:'Evelyn',a:'Eve',i:'EV'}
+  jane:{n:'Jane',a:'camisa 10',i:'JA',g:'f'},lucas:{n:'Lucas Neiva',a:'Mineirinho',i:'LN',g:'m'},ana:{n:'Ana Luiza',a:'Incendiária',i:'AL',g:'f'},
+  larissa:{n:'Larissa',a:'BOPE',i:'LA',g:'f'},arthur:{n:'Arthur',a:'Cocoricó',i:'AR',g:'m'},breno:{n:'Breno',a:'Sangue nos zói',i:'BR',g:'m'},evelyn:{n:'Evelyn',a:'Eve',i:'EV',g:'f'}
 };
 const ACT={
- '60':{e:'🔄',l:'Recuperação (50+ dias)',s:'Recuperação',d:'50+ dias atrasado',p:60,tier:1,t:'Mestre da Ressurreição'},
- '50':{e:'⚡',l:'Reativação (30+ dias)',s:'Reativação',d:'30+ dias atrasado',p:50,tier:2,t:'Caçador(a) de Inativos'},
- '40i':{e:'🤝',l:'Indicação gerada',s:'Indicação',d:'Cliente indicou outro',p:40,tier:2,t:'Embaixador(a)'},
- '40':{e:'⏫',l:'Upgrade de duração (mensal → anual)',s:'Upg. mensal→anual',d:'Mensal → Anual',p:40,tier:2,t:'Fidelizador(a)'},
+ '60':{e:'🔄',l:'Recuperação (50+ dias)',s:'Recuperação',d:'50+ dias atrasado',p:60,tier:1,t:['Mestre da Ressurreição','Mestra da Ressurreição']},
+ '50':{e:'⚡',l:'Reativação (30+ dias)',s:'Reativação',d:'30+ dias atrasado',p:50,tier:2,t:['Caçador de Inativos','Caçadora de Inativos']},
+ '40i':{e:'🤝',l:'Indicação gerada',s:'Indicação',d:'Cliente indicou outro',p:40,tier:2,t:['Embaixador','Embaixadora']},
+ '40':{e:'⏫',l:'Upgrade de duração (mensal → anual)',s:'Upg. mensal→anual',d:'Mensal → Anual',p:40,tier:2,t:['Fidelizador','Fidelizadora']},
  '40k':{e:'💎',l:'Plano acima de R$6k',s:'Plano +6k',d:'Por contrato fechado',p:40,tier:2,t:'Ticket Premium'},
  '30':{e:'📈',l:'Upgrade de plano',s:'Upgrade de plano',d:'Bronze → Prata etc.',p:30,t:'Sobe Patente'},
- '30ts':{e:'⏫',l:'Upgrade de duração (trimestral → semestral)',s:'Upg. tri→sem',d:'Trimestral → Semestral',p:30,t:'Fidelizador(a)'},
- '30sa':{e:'⏫',l:'Upgrade de duração (semestral → anual)',s:'Upg. sem→anual',d:'Semestral → Anual',p:30,t:'Fidelizador(a)'},
+ '30ts':{e:'⏫',l:'Upgrade de duração (trimestral → semestral)',s:'Upg. tri→sem',d:'Trimestral → Semestral',p:30,t:['Fidelizador','Fidelizadora']},
+ '30sa':{e:'⏫',l:'Upgrade de duração (semestral → anual)',s:'Upg. sem→anual',d:'Semestral → Anual',p:30,t:['Fidelizador','Fidelizadora']},
  '30r':{e:'🛡️',l:'Retenção (churn)',s:'Retenção',d:'Cliente salvo',p:30,t:'Muralha'},
- '25u':{e:'➕',l:'Upsell add-on',s:'Upsell add-on',d:'Por cliente',p:25,t:'Rei/Rainha dos Upsells'},
+ '25u':{e:'➕',l:'Upsell add-on',s:'Upsell add-on',d:'Por cliente',p:25,t:['Rei dos Upsells','Rainha dos Upsells']},
  '20k':{e:'💎',l:'Plano acima de R$3k',s:'Plano +3k',d:'Por contrato fechado',p:20,t:'Ticket Alto'},
- '10a':{e:'📅',l:'Antecipação de renovação',s:'Antecipação',d:'Antes do vencimento',p:10,t:'Antecipador(a)'}
+ '10a':{e:'📅',l:'Antecipação de renovação',s:'Antecipação',d:'Antes do vencimento',p:10,t:['Antecipador','Antecipadora']}
 };
 const LEG={'30u':['Upsell add-on',30,'25u'],'25':['Upsell add-on',25,'25u'],'20':['Retenção (churn)',20,'30r'],'18':['Renovação',18,null],'10':['Atividade comercial',10,null],'15':['Avaliação no Google',15,null]};
 const UPG=['30','40','30ts','30sa'];
@@ -267,19 +269,36 @@ async function load(manual){
 function renderAll(){rRank();rSide();rTabs();rPanel()}
 
 /* ---------- ranking ---------- */
-function calcTitle(k){
-  const c={};S.history.filter(h=>h.playerKey===k).forEach(h=>{const ck=canon(h.pts);if(ck)c[ck]=(c[ck]||0)+1});
-  const e=Object.entries(c).sort((a,b)=>b[1]-a[1]);return e.length?ACT[e[0][0]].e+' '+ACT[e[0][0]].t:null;
+/* Título exclusivo: fica com quem mais fez aquela modalidade na semana.
+   Empate: leva quem chegou àquela quantidade primeiro. */
+function weekTitles(){
+  const g={};
+  S.history.forEach(h=>{
+    const c=canon(h.pts);if(!c||!PL[h.playerKey])return;
+    const t=ACT[c].t,key=Array.isArray(t)?t[0]:t;
+    const grp=g[key]=g[key]||{def:ACT[c],p:{}};
+    const x=grp.p[h.playerKey]=grp.p[h.playerKey]||{n:0,at:0};
+    x.n++;const ts=new Date(h.validatedAt).getTime()||0;if(ts>x.at)x.at=ts;
+  });
+  const out={};
+  Object.values(g).forEach(grp=>{
+    const c=Object.entries(grp.p).sort((a,b)=>b[1].n-a[1].n||a[1].at-b[1].at);
+    if(!c.length)return;
+    const k=c[0][0],v=c[0][1],t=grp.def.t;
+    (out[k]=out[k]||[]).push({e:grp.def.e,txt:Array.isArray(t)?(PL[k].g==='f'?t[1]:t[0]):t,n:v.n,w:v.n*grp.def.p});
+  });
+  Object.keys(out).forEach(k=>out[k].sort((a,b)=>b.w-a.w||b.n-a.n));
+  return out;
 }
 function rRank(){
-  const pts=S.points||{},o=order(pts),max=Math.max(...o.map(k=>Number(pts[k])||0),1);
+  const pts=S.points||{},o=order(pts),max=Math.max(...o.map(k=>Number(pts[k])||0),1),tt=weekTitles();
   const tot=o.reduce((s,k)=>s+(Number(pts[k])||0),0);
   $('rsub').textContent=num(tot)+' pts · '+(S.validated||0)+' ações validadas';
   const H=[96,126,74],C=[['#F0F2F6','#444'],['#FAEEDA','#854F0B'],['#FAECE7','#712B13']],sl=[o[1],o[0],o[2]];
   $('pod').innerHTML=sl.map((k,i)=>`<div class="pc">${i===1?'<i class="ti ti-crown crown"></i>':''}${av(k)}<span class="nm">${PL[k].n.split(' ')[0]}</span><div class="pb" style="height:${H[i]}px;background:${C[i][0]};color:${C[i][1]}">${num(pts[k])}</div></div>`).join('');
   $('rk').innerHTML=o.map((k,i)=>{
-    const p=PL[k],t=calcTitle(k),v=Number(pts[k])||0;
-    return `<div class="rw"><div class="rn">${i+1}</div>${av(k)}<div style="min-width:0"><div class="pn">${p.n}</div><span class="pa">${esc(p.a)}</span>${t?`<span class="pt">${t}</span>`:''}</div><div class="bar"><i class="b-${k}" style="width:${Math.round(v/max*100)}%"></i></div><div class="pp"><div><b>${num(v)}</b><small> pts</small></div><button class="mini adm" onclick="openEdit('${k}')" aria-label="Editar pontos de ${p.n}"><i class="ti ti-pencil"></i></button></div></div>`;
+    const p=PL[k],t=(tt[k]||[]).slice(0,2).map(x=>x.e+' '+x.txt).join(' · '),v=Number(pts[k])||0;
+    return `<div class="rw"><div class="rn">${i+1}</div>${av(k)}<div style="min-width:0"><div class="pn">${p.n}</div><span class="pa">${esc(p.a)}</span>${t?`<span class="pt">${t}</span>`:''}</div><div class="bar"><i class="b-${k}" style="width:${Math.round(v/max*100)}%"></i></div><div class="pp"><span class="pv"><b>${num(v)}</b><small>pts</small></span><button class="mini adm" onclick="openEdit('${k}')" aria-label="Editar pontos de ${p.n}"><i class="ti ti-pencil"></i></button></div></div>`;
   }).join('');
 }
 
