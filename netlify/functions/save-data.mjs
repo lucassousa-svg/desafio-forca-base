@@ -1,11 +1,11 @@
 import { getStore } from "@netlify/blobs";
 
 const ptsMap = {
-  '50':50,'60':60,'30':30,'40':40,
-  '25u':25,'30r':30,'40i':40,'10a':10,
-  '30ts':30,'30sa':30,'20k':20,'40k':40,
+  '60':60,'50':50,'40i':40,'40':40,'40k':40,
+  '30':30,'30ts':30,'30sa':30,'30r':30,'25u':25,'20k':20,'10a':10,
+  '30u':30,'25':25,'20':20,'18':18,'10':10,'15':15,
 };
-function resolvePoints(pts) { return ptsMap[String(pts)] ?? parseInt(pts) ?? 0; }
+function resolvePoints(pts) { return ptsMap[String(pts)] ?? (parseInt(pts) || 0); }
 
 export default async (req, context) => {
   if (req.method !== "POST") return new Response("Method not allowed", { status: 405 });
@@ -16,45 +16,54 @@ export default async (req, context) => {
     try { const raw = await store.get(key); return raw ? JSON.parse(raw) : fallback; }
     catch { return fallback; }
   };
+  const setItem = (key, value) => store.set(key, JSON.stringify(value));
 
   if (action === "add-pending") {
     const pending = await getItem("pending", []);
     pending.push(payload);
-    await store.set("pending", JSON.stringify(pending));
+    await setItem("pending", pending);
     return Response.json({ ok: true });
   }
 
   if (action === "validate") {
-    const { id, playerKey, pts } = payload;
+    const { id, playerKey, pts, label } = payload;
     const pending = await getItem("pending", []);
+    const item = pending.find(p => p.id === id);
+    if (!item) return Response.json({ error: "not found" }, { status: 404 });
     const points = await getItem("points", {});
     const validated = await getItem("validated", 0);
     const history = await getItem("history", []);
-    const item = pending.find(p => p.id === id);
-    const resolvedPts = resolvePoints(pts);
-    points[playerKey] = (points[playerKey] || 0) + resolvedPts;
-    history.unshift({ id, playerKey, pts: item?.pts || pts, resolvedPts, link: item?.link || "", validatedAt: new Date().toISOString() });
-    await store.set("pending", JSON.stringify(pending.filter(p => p.id !== id)));
-    await store.set("points", JSON.stringify(points));
-    await store.set("validated", JSON.stringify(validated + 1));
-    await store.set("history", JSON.stringify(history));
+    const code = item.pts ?? pts;
+    const resolvedPts = resolvePoints(code);
+    const key = item.playerKey || playerKey;
+    points[key] = (points[key] || 0) + resolvedPts;
+    history.unshift({
+      id, playerKey: key, pts: code, resolvedPts,
+      label: item.label || label || "",
+      link: item.link || "", validatedAt: new Date().toISOString()
+    });
+    await setItem("pending", pending.filter(p => p.id !== id));
+    await setItem("points", points);
+    await setItem("validated", validated + 1);
+    await setItem("history", history);
     return Response.json({ ok: true });
   }
 
   if (action === "deny-pending") {
     const { id, reason } = payload;
     const pending = await getItem("pending", []);
-    const denied = await getItem("denied", []);
     const item = pending.find(p => p.id === id);
-    if (item) denied.unshift({ ...item, reason, deniedAt: new Date().toISOString() });
-    await store.set("pending", JSON.stringify(pending.filter(p => p.id !== id)));
-    await store.set("denied", JSON.stringify(denied));
+    if (!item) return Response.json({ error: "not found" }, { status: 404 });
+    const denied = await getItem("denied", []);
+    denied.unshift({ ...item, reason, deniedAt: new Date().toISOString() });
+    await setItem("pending", pending.filter(p => p.id !== id));
+    await setItem("denied", denied);
     return Response.json({ ok: true });
   }
 
   if (action === "delete-pending") {
     const pending = await getItem("pending", []);
-    await store.set("pending", JSON.stringify(pending.filter(p => p.id !== payload.id)));
+    await setItem("pending", pending.filter(p => p.id !== payload.id));
     return Response.json({ ok: true });
   }
 
@@ -64,10 +73,12 @@ export default async (req, context) => {
     const points = await getItem("points", {});
     const validated = await getItem("validated", 0);
     const item = history.find(h => h.id === id);
-    if (item) points[item.playerKey] = Math.max(0, (points[item.playerKey] || 0) - resolvePoints(item.pts));
-    await store.set("history", JSON.stringify(history.filter(h => h.id !== id)));
-    await store.set("points", JSON.stringify(points));
-    await store.set("validated", JSON.stringify(Math.max(0, validated - 1)));
+    if (!item) return Response.json({ error: "not found" }, { status: 404 });
+    const back = Number(item.resolvedPts) > 0 ? Number(item.resolvedPts) : resolvePoints(item.pts);
+    points[item.playerKey] = Math.max(0, (points[item.playerKey] || 0) - back);
+    await setItem("history", history.filter(h => h.id !== id));
+    await setItem("points", points);
+    await setItem("validated", Math.max(0, validated - 1));
     return Response.json({ ok: true });
   }
 
@@ -77,17 +88,17 @@ export default async (req, context) => {
     if (op === "add") points[playerKey] = (points[playerKey] || 0) + Number(value);
     else if (op === "remove") points[playerKey] = Math.max(0, (points[playerKey] || 0) - Number(value));
     else if (op === "set") points[playerKey] = Number(value);
-    await store.set("points", JSON.stringify(points));
+    await setItem("points", points);
     return Response.json({ ok: true });
   }
 
   if (action === "update-motiv") {
-    await store.set("motiv", JSON.stringify(payload.text));
+    await setItem("motiv", payload.text);
     return Response.json({ ok: true });
   }
 
   if (action === "update-metas") {
-    await store.set("metas", JSON.stringify(payload.metas));
+    await setItem("metas", payload.metas);
     return Response.json({ ok: true });
   }
 
@@ -97,13 +108,13 @@ export default async (req, context) => {
     const idx = daily.findIndex(d => d.date === date);
     if (idx >= 0) daily[idx] = { date, receita };
     else daily.push({ date, receita });
-    await store.set("dailyHistory", JSON.stringify(daily));
+    await setItem("dailyHistory", daily);
     return Response.json({ ok: true });
   }
 
   if (action === "remove-daily") {
     const daily = await getItem("dailyHistory", []);
-    await store.set("dailyHistory", JSON.stringify(daily.filter(d => d.date !== payload.date)));
+    await setItem("dailyHistory", daily.filter(d => d.date !== payload.date));
     return Response.json({ ok: true });
   }
 
@@ -111,12 +122,17 @@ export default async (req, context) => {
     const history = await getItem("history", []);
     const points = await getItem("points", {});
     const validated = await getItem("validated", 0);
-    const today = new Date().toLocaleDateString('pt-BR');
-    const todayItems = history.filter(h => h.validatedAt && new Date(h.validatedAt).toLocaleDateString('pt-BR') === today);
-    todayItems.forEach(h => { points[h.playerKey] = Math.max(0, (points[h.playerKey] || 0) - resolvePoints(h.pts)); });
-    await store.set("history", JSON.stringify(history.filter(h => !h.validatedAt || new Date(h.validatedAt).toLocaleDateString('pt-BR') !== today)));
-    await store.set("points", JSON.stringify(points));
-    await store.set("validated", JSON.stringify(Math.max(0, validated - todayItems.length)));
+    const tz = { timeZone: "America/Sao_Paulo" };
+    const today = new Date().toLocaleDateString("pt-BR", tz);
+    const isToday = h => h.validatedAt && new Date(h.validatedAt).toLocaleDateString("pt-BR", tz) === today;
+    const todayItems = history.filter(isToday);
+    todayItems.forEach(h => {
+      const back = Number(h.resolvedPts) > 0 ? Number(h.resolvedPts) : resolvePoints(h.pts);
+      points[h.playerKey] = Math.max(0, (points[h.playerKey] || 0) - back);
+    });
+    await setItem("history", history.filter(h => !isToday(h)));
+    await setItem("points", points);
+    await setItem("validated", Math.max(0, validated - todayItems.length));
     return Response.json({ ok: true });
   }
 
@@ -127,27 +143,26 @@ export default async (req, context) => {
     const history = await getItem("history", []);
     const weeks = await getItem("weeks", []);
     weeks.unshift({ label, points: { ...points }, validated, history: [...history], closedAt: new Date().toISOString() });
-    await store.set("weeks", JSON.stringify(weeks));
-    await store.set("points", JSON.stringify({}));
-    await store.set("validated", JSON.stringify(0));
-    await store.set("history", JSON.stringify([]));
-    await store.set("pending", JSON.stringify([]));
-    await store.set("denied", JSON.stringify([]));
+    await setItem("weeks", weeks);
+    await setItem("points", {});
+    await setItem("validated", 0);
+    await setItem("history", []);
+    await setItem("pending", []);
+    await setItem("denied", []);
     return Response.json({ ok: true });
   }
 
   if (action === "close-month") {
     const { label, counts, receita, meta, ranking, closedAt } = payload;
     const monthHistory = await getItem("monthHistory", []);
-    monthHistory.unshift({ label, counts, receita, meta, ranking: ranking||[], closedAt });
-    await store.set("monthHistory", JSON.stringify(monthHistory));
-    // Zera pontos, histórico semanal, receita diária e pendentes
-    await store.set("points", JSON.stringify({}));
-    await store.set("history", JSON.stringify([]));
-    await store.set("validated", JSON.stringify(0));
-    await store.set("dailyHistory", JSON.stringify([]));
-    await store.set("pending", JSON.stringify([]));
-    await store.set("denied", JSON.stringify([]));
+    monthHistory.unshift({ label, counts, receita, meta, ranking: ranking || [], closedAt });
+    await setItem("monthHistory", monthHistory);
+    await setItem("points", {});
+    await setItem("history", []);
+    await setItem("validated", 0);
+    await setItem("dailyHistory", []);
+    await setItem("pending", []);
+    await setItem("denied", []);
     return Response.json({ ok: true });
   }
 
