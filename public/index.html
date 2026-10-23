@@ -1,1296 +1,474 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Operação Base Forte — GestãoClick</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --gc-dark: #001636; --gc-red: #CC0000; --gc-blue: #0268CD;
-      --bg: #f4f6f9; --surface: #ffffff; --surface2: #f0f2f6;
-      --border: rgba(0,0,0,0.09); --border-md: rgba(0,0,0,0.15);
-      --text: #0d1117; --text-muted: #6b7280; --text-faint: #9ca3af;
-      --radius: 10px; --radius-lg: 14px;
-    }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 1.5rem 1rem 4rem; }
-
-    /* 3-column layout */
-    .layout { display: grid; grid-template-columns: 280px 1fr 280px; gap: 16px; max-width: 1400px; margin: 0 auto; align-items: start; }
-    @media (max-width: 1100px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } }
-
-    /* Sidebar shared */
-    .sidebar { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 1.5rem; }
-    .sidebar-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
-    .sidebar-title { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; background: var(--gc-dark); padding: 10px 14px; border-radius: var(--radius); gap: 8px; }
-    .sidebar-title span { color: #fff; display: flex; align-items: center; gap: 6px; }
-    .sidebar-title span i { color: rgba(255,255,255,0.7); }
-    .kpi-receita-card { background: var(--gc-dark); border-radius: var(--radius); padding: 12px 14px; margin-top: 4px; }
-    .kpi-receita-card .kpi-label { color: rgba(255,255,255,0.6); }
-    .kpi-receita-card .kpi-value { color: #fff; }
-    .kpi-receita-card .kpi-meta { color: rgba(255,255,255,0.5); }
-    .kpi-receita-card .kpi-bar-bg { background: rgba(255,255,255,0.15); }
-    .kpi-receita-card .kpi-footer { color: rgba(255,255,255,0.5); }
-
-    /* KPI cards left sidebar */
-    .kpi-item { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 0.5px solid var(--border); }
-    .kpi-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-    .kpi-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
-    .kpi-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-    .kpi-value { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
-    .kpi-meta { font-size: 11px; color: var(--text-faint); }
-    .kpi-bar-bg { background: var(--surface2); border-radius: 4px; height: 5px; margin-top: 6px; overflow: hidden; }
-    .kpi-bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
-    .kpi-footer { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: var(--text-faint); }
-    .kpi-badge { font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 500; }
-    .kpi-badge.ok { background: #EAF3DE; color: #27500A; }
-    .kpi-badge.warn { background: #FEF3C7; color: #92400E; }
-    .kpi-badge.risk { background: #FAECE7; color: #712B13; }
-
-    /* Edit meta button */
-    .edit-meta-btn { font-size: 11px; padding: 3px 8px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: transparent; color: var(--text-muted); cursor: pointer; display: none; font-family: 'Inter', sans-serif; }
-    .admin-mode .edit-meta-btn { display: inline-flex; align-items: center; gap: 3px; }
-
-    /* History right sidebar */
-    .history-entry { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
-    .history-entry:last-child { border-bottom: none; }
-    .history-date { font-size: 11px; color: var(--text-muted); white-space: nowrap; min-width: 48px; }
-    .history-bar-wrap { flex: 1; }
-    .history-bar-bg { background: var(--surface2); border-radius: 3px; height: 5px; }
-    .history-bar-fill { height: 100%; border-radius: 3px; background: var(--gc-blue); }
-    .history-val { font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; min-width: 56px; text-align: right; }
-    .add-day-btn { width: 100%; font-size: 12px; padding: 7px; border: 0.5px dashed var(--border-md); border-radius: var(--radius); background: transparent; color: var(--text-muted); cursor: pointer; margin-top: 8px; font-family: 'Inter', sans-serif; display: none; }
-    .admin-mode .add-day-btn { display: block; }
-
-    /* Center column */
-    .center { min-width: 0; }
-    .header { background: var(--gc-dark); border-radius: var(--radius-lg); padding: 1.5rem 1.75rem; margin-bottom: 1rem; position: relative; overflow: hidden; }
-    .header::before { content: ''; position: absolute; top: -40px; right: -40px; width: 180px; height: 180px; background: var(--gc-red); opacity: 0.07; border-radius: 50%; }
-    .header-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--gc-red); color: #fff; font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 10px; }
-    .header h1 { font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 700; color: #fff; line-height: 1.25; margin-bottom: 4px; }
-    .header p { font-size: 12px; color: rgba(255,255,255,0.5); }
-    .admin-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
-    .admin-input-wrap { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 0.5px solid var(--border-md); border-radius: var(--radius); padding: 6px 12px; flex: 1; min-width: 160px; }
-    .admin-input-wrap i { font-size: 16px; color: var(--text-faint); }
-    .admin-input-wrap input { border: none; outline: none; font-size: 13px; font-family: 'Inter', sans-serif; color: var(--text); background: transparent; width: 100%; }
-    .admin-btn { font-size: 13px; padding: 8px 14px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
-    .admin-btn:hover { background: var(--surface2); }
-    .admin-status { font-size: 12px; padding: 5px 12px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
-    .admin-status.ok { background: #EAF3DE; color: #27500A; }
-    .admin-status.err { background: #FAECE7; color: #712B13; }
-    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 1rem; }
-    .stat-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
-    .stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-    .stat-value { font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700; color: var(--text); line-height: 1; }
-    .stat-sub { font-size: 11px; color: var(--text-faint); margin-top: 2px; }
-    .section-title { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 6px; }
-    .section-header-btns { display: flex; gap: 6px; }
-    .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem; }
-    .ranking-row { display: grid; grid-template-columns: 36px 1fr 90px 80px; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid var(--border); gap: 10px; transition: background 0.15s; }
-    .ranking-row:last-child { border-bottom: none; }
-    .ranking-row:hover { background: var(--surface2); }
-    .ranking-row.overtake { animation: overtakePulse 1.2s ease; }
-    @keyframes overtakePulse { 0%{background:#fff}20%{background:#FFF3CD;transform:scale(1.01)}60%{background:#FFF9E6}100%{background:#fff;transform:scale(1)} }
-    .rank-n { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; color: var(--text-faint); text-align: center; }
-    .player-cell { display: flex; align-items: center; gap: 8px; }
-    .avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; flex-shrink: 0; }
-    .av-jane{background:#E6F1FB;color:#0C447C} .av-lucas{background:#EAF3DE;color:#27500A} .av-ana{background:#FAECE7;color:#712B13} .av-larissa{background:#EEEDFE;color:#3C3489} .av-arthur{background:#FEF0E6;color:#93340A} .av-breno{background:#DDEEDD;color:#145214} .av-evelyn{background:#EDE0F5;color:#5B2D8E}
-    .player-name { font-size: 13px; font-weight: 500; color: var(--text); }
-    .player-alias { font-size: 10px; color: var(--text-muted); background: var(--surface2); padding: 1px 6px; border-radius: 8px; display: inline-block; margin-top: 1px; }
-    .player-title { font-size: 10px; color: var(--gc-red); font-weight: 500; margin-top: 1px; display: block; }
-    .bar-wrap { display: flex; align-items: center; }
-    .bar-bg { flex: 1; background: var(--surface2); border-radius: 4px; height: 5px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
-    .bar-jane{background:#378ADD} .bar-lucas{background:#639922} .bar-ana{background:#D85A30} .bar-larissa{background:#7F77DD} .bar-arthur{background:#E8720C} .bar-breno{background:#2D8A2D} .bar-evelyn{background:#9B59D0}
-    .points-cell { text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
-    .points-big { font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); }
-    .points-label { font-size: 10px; color: var(--text-faint); }
-    .edit-pts-btn { background: none; border: 0.5px solid var(--border-md); border-radius: 6px; padding: 2px 5px; cursor: pointer; color: var(--text-muted); font-size: 13px; display: none; }
-    .admin-mode .edit-pts-btn { display: flex; align-items: center; }
-    .legend-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: 6px; margin-bottom: 1rem; }
-    .legend-item { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
-    .legend-tier-1 { border-color: #CC0000; border-width: 1.5px; }
-    .legend-tier-1 .legend-pts-num { color: #CC0000; }
-    .legend-tier-2 { border-color: #E8720C; border-width: 1px; }
-    .legend-tier-2 .legend-pts-num { color: #E8720C; }
-    .legend-tier-1 .legend-emoji { animation: pulse1 1.8s ease-in-out infinite; display: inline-block; }
-    .legend-tier-2 .legend-emoji { animation: pulse2 2.2s ease-in-out infinite; display: inline-block; }
-    @keyframes pulse1 {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(204,0,0,0)); }
-      50% { transform: scale(1.25); filter: drop-shadow(0 0 6px rgba(204,0,0,0.5)); }
-    }
-    @keyframes pulse2 {
-      0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 0px rgba(232,114,12,0)); }
-      50% { transform: scale(1.2) rotate(-8deg); filter: drop-shadow(0 0 5px rgba(232,114,12,0.45)); }
-    }
-    .legend-emoji { font-size: 17px; flex-shrink: 0; }
-    .legend-name { font-size: 12px; font-weight: 500; color: var(--text); }
-    .legend-desc { font-size: 10px; color: var(--text-muted); }
-    .legend-pts-wrap { margin-left: auto; text-align: right; }
-    .legend-pts-num { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 700; color: var(--gc-dark); }
-    .legend-pts-lbl { font-size: 9px; color: var(--text-faint); }
-    .pending-list,.history-list,.denied-list { display: flex; flex-direction: column; gap: 6px; }
-    .pending-item,.history-item,.denied-item { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 9px 12px; }
-    .denied-item { border-color: rgba(204,0,0,0.2); background: #FFF8F8; }
-    .pending-avatar,.history-avatar,.denied-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; font-family: 'Outfit', sans-serif; }
-    .pending-name,.history-name-wrap,.denied-name { font-size: 12px; color: var(--text); flex: 1; min-width: 0; }
-    .pending-action,.history-action,.denied-action { font-size: 11px; color: var(--text-muted); }
-    .denied-reason { font-size: 10px; color: #CC0000; margin-top: 2px; }
-    .pending-pts,.history-pts,.denied-pts { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; color: var(--text); margin-right: 2px; white-space: nowrap; }
-    .action-btn { font-size: 11px; padding: 4px 9px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: transparent; color: var(--text); cursor: pointer; display: none; align-items: center; gap: 3px; white-space: nowrap; font-family: 'Inter', sans-serif; }
-    .action-btn.green:hover { background: #EAF3DE; color: #27500A; border-color: #27500A; }
-    .action-btn.red:hover { background: #FAECE7; color: #712B13; border-color: #712B13; }
-    .action-btn.gray:hover { background: var(--surface2); }
-    .admin-mode .action-btn { display: flex; }
-    .empty-state { font-size: 12px; color: var(--text-faint); padding: 14px 0; text-align: center; }
-    .add-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 7px 14px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer; margin-bottom: 10px; font-family: 'Inter', sans-serif; }
-    .refresh-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 5px 10px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: var(--surface); color: var(--text-muted); cursor: pointer; margin-bottom: 10px; margin-left: 6px; font-family: 'Inter', sans-serif; }
-    .admin-week-btn { display: none; align-items: center; gap: 5px; font-size: 11px; padding: 5px 12px; border-radius: var(--radius); cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap; }
-    .admin-week-btn.red { border: 0.5px solid #CC0000; color: #CC0000; background: transparent; }
-    .admin-week-btn.red:hover { background: #FAECE7; }
-    .admin-week-btn.gray { border: 0.5px solid #6b7280; color: #6b7280; background: transparent; }
-    .admin-week-btn.gray:hover { background: var(--surface2); }
-    .admin-mode .admin-week-btn { display: flex; }
-    .history-link { font-size: 10px; color: var(--gc-blue); text-decoration: none; white-space: nowrap; display: flex; align-items: center; gap: 2px; }
-    .history-date-lbl { font-size: 10px; color: var(--text-faint); white-space: nowrap; }
-    .week-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 10px; overflow: hidden; }
-    .week-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
-    .week-header:hover { background: var(--surface2); }
-    .week-label { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); }
-    .week-meta { font-size: 11px; color: var(--text-muted); }
-    .week-body { padding: 10px 14px; display: none; }
-    .week-body.open { display: block; }
-    .week-ranking-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
-    .week-ranking-row:last-child { border-bottom: none; }
-    .week-pts { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; margin-left: auto; }
-    .spinning { animation: spin 1s linear infinite; }
-    @keyframes spin { from{transform:rotate(0deg)}to{transform:rotate(360deg)} }
-    .loading-overlay { display: flex; align-items: center; justify-content: center; padding: 1.5rem; color: var(--text-faint); font-size: 12px; gap: 6px; }
-
-    /* Duplicado badge */
-    .dup-badge { display: none; font-size: 10px; padding: 2px 7px; border-radius: 10px; background: #FEF3C7; color: #92400E; border: 0.5px solid #F59E0B; white-space: nowrap; align-items: center; gap: 3px; }
-    .dup-warning { font-size: 11px; color: #92400E; background: #FEF3C7; border: 0.5px solid #F59E0B; border-radius: var(--radius); padding: 5px 10px; margin-bottom: 6px; }
-
-    /* Collapsible sections */
-    .collapsible-header { display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; margin-bottom: 8px; cursor: pointer; user-select: none; }
-    .collapsible-header:hover .collapse-btn { color: var(--text-primary); }
-    .collapse-btn { font-size: 11px; color: var(--text-faint); background: none; border: 0.5px solid var(--border-md); border-radius: var(--radius); padding: 2px 8px; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; align-items: center; gap: 3px; transition: all 0.15s; }
-    .collapse-btn:hover { background: var(--surface2); }
-    .collapsible-body { overflow: hidden; transition: max-height 0.3s ease; }
-    .collapsible-body.collapsed { max-height: 0 !important; }
-
-    /* Modalidades */
-    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border-radius: var(--radius); border: 0.5px solid var(--border); margin-top: 10px; }
-    .modal-cell { padding: 9px 12px; border-bottom: 0.5px solid var(--border); }
-    .modal-cell:nth-child(odd) { border-right: 0.5px solid var(--border); }
-    .modal-cell:nth-last-child(-n+2) { border-bottom: none; }
-    .modal-cell-label { font-size: 10px; color: var(--text-muted); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .modal-cell-value { font-size: 20px; font-weight: 500; }
-    .mv-tier1 { color: #CC0000; }
-    .mv-tier2 { color: #E8720C; }
-    .mv-normal { color: var(--text-primary); }
-    .admin-mode .dup-badge { display: flex; }
-    .dup-item { border-color: var(--border) !important; background: var(--surface) !important; }
-    .admin-mode .dup-item { border-color: #F59E0B !important; background: #FFFBEB !important; }
-
-    /* Countdown */
-    .countdown-bar { background: var(--gc-dark); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .countdown-label { font-size: 11px; color: rgba(255,255,255,0.5); display: flex; align-items: center; gap: 5px; }
-    .countdown-timer { font-family: 'Outfit', sans-serif; font-size: 16px; font-weight: 700; color: #fff; font-variant-numeric: tabular-nums; }
-    .countdown-timer.urgent { color: #FF6B6B; animation: blink 1s ease-in-out infinite; }
-    @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.6} }
-
-    /* Mensagem motivacional */
-    .motivational-bar { border-radius: var(--radius); padding: 10px 16px; margin-bottom: 1rem; display: flex; align-items: center; gap: 10px; background: linear-gradient(135deg, #001636 0%, #002855 100%); border: 0.5px solid rgba(255,255,255,0.08); }
-    .motivational-text { font-size: 13px; color: #fff; flex: 1; font-style: italic; line-height: 1.4; }
-    .motivational-edit { font-size: 11px; padding: 3px 8px; border: 0.5px solid rgba(255,255,255,0.25); border-radius: var(--radius); background: transparent; color: rgba(255,255,255,0.6); cursor: pointer; display: none; white-space: nowrap; font-family: 'Inter', sans-serif; }
-    .motivational-edit:hover { background: rgba(255,255,255,0.1); }
-    .admin-mode .motivational-edit { display: flex; align-items: center; gap: 3px; }
-
-    /* Filtro histórico */
-    .filter-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-    .filter-btn { font-size: 11px; padding: 4px 10px; border: 0.5px solid var(--border-md); border-radius: 20px; background: var(--surface); color: var(--text-muted); cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; display: flex; align-items: center; gap: 4px; }
-    .filter-btn:hover { background: var(--surface2); }
-    .filter-btn.active { background: var(--gc-dark); color: #fff; border-color: var(--gc-dark); }
-
-    /* Campeão destaque nas semanas */
-    .week-champion { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: linear-gradient(135deg, #001636 0%, #002855 100%); border-radius: var(--radius); margin-bottom: 10px; }
-    .week-champion-crown { font-size: 18px; }
-    .week-champion-name { font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; color: #fff; }
-    .week-champion-pts { font-family: 'Outfit', sans-serif; font-size: 12px; color: rgba(255,255,255,0.6); }
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,10,30,0.45); align-items: center; justify-content: center; z-index: 200; }
-    .modal-overlay.open { display: flex; }
-    .modal { background: var(--surface); border: 0.5px solid var(--border-md); border-radius: var(--radius-lg); padding: 1.5rem; width: 400px; max-width: 92vw; box-shadow: 0 16px 48px rgba(0,0,0,0.18); }
-    .modal h2 { font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
-    .modal p { font-size: 12px; color: var(--text-muted); margin-bottom: 1rem; }
-    .modal select,.modal input[type=text],.modal input[type=number],.modal input[type=date],.modal textarea { width: 100%; margin-bottom: 8px; font-size: 13px; font-family: 'Inter', sans-serif; border: 0.5px solid var(--border-md); border-radius: var(--radius); padding: 8px 11px; background: var(--surface); color: var(--text); outline: none; appearance: none; resize: vertical; }
-    .modal select:focus,.modal input:focus,.modal textarea:focus { border-color: var(--gc-blue); }
-    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
-    .btn-cancel { font-size: 12px; padding: 7px 14px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: transparent; color: var(--text-muted); cursor: pointer; font-family: 'Inter', sans-serif; }
-    .btn-confirm { font-size: 12px; padding: 7px 16px; border: none; border-radius: var(--radius); background: var(--gc-red); color: #fff; cursor: pointer; font-weight: 600; font-family: 'Outfit', sans-serif; }
-    .btn-confirm:hover { background: #aa0000; }
-    .btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-danger { font-size: 12px; padding: 7px 16px; border: none; border-radius: var(--radius); background: #CC0000; color: #fff; cursor: pointer; font-weight: 600; font-family: 'Outfit', sans-serif; }
-    .btn-danger:hover { background: #aa0000; }
-    .btn-danger:disabled { opacity: 0.5; cursor: not-allowed; }
-    .link-hint { font-size: 10px; color: var(--text-faint); margin-top: -4px; margin-bottom: 8px; }
-    .edit-player-header { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; padding-bottom: 10px; border-bottom: 0.5px solid var(--border); }
-    .edit-player-avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; }
-    .edit-current { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
-    .edit-current span { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; color: var(--text); }
-    .edit-ops { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-    .edit-op-btn { padding: 8px; border: 0.5px solid var(--border-md); border-radius: var(--radius); background: var(--surface2); color: var(--text); font-size: 12px; cursor: pointer; font-family: 'Inter', sans-serif; text-align: center; }
-    .edit-op-btn.selected { border-color: var(--gc-blue); background: #E6F1FB; color: #0C447C; }
-    .overtake-toast { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: #fff; font-size: 12px; padding: 9px 18px; border-radius: 20px; opacity: 0; transition: opacity 0.4s; z-index: 1000; pointer-events: none; white-space: nowrap; box-shadow: 0 4px 24px rgba(0,0,0,0.25); }
-    .overtake-toast.show { opacity: 1; }
-    .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--gc-dark); color: #fff; font-size: 12px; padding: 9px 18px; border-radius: 20px; opacity: 0; transition: opacity 0.3s; z-index: 999; pointer-events: none; }
-    .toast.show { opacity: 1; }
-    .month-label { font-size: 11px; color: var(--text-faint); margin-top: 2px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Operação Base Forte — GestãoClick</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--dark:#001636;--red:#CC0000;--blue:#0268CD;--bg:#f4f6f9;--sf:#fff;--sf2:#f0f2f6;--bd:rgba(0,0,0,.09);--bd2:rgba(0,0,0,.15);--tx:#0d1117;--mu:#6b7280;--fa:#9ca3af;--r:10px;--rl:14px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding:1.25rem 1rem 4rem}
+.wrap{max-width:1180px;margin:0 auto}
+button{font-family:'Inter',sans-serif;cursor:pointer}
+.adm{display:none!important}
+body.admin .adm{display:inline-flex!important}
+body.admin .adm-b{display:block!important}
+/* hero */
+.hero{background:var(--dark);border-radius:var(--rl);padding:1.25rem 1.5rem 1rem;position:relative;overflow:hidden;margin-bottom:14px}
+.hero::before{content:'';position:absolute;top:-50px;right:-40px;width:220px;height:220px;background:var(--red);opacity:.08;border-radius:50%}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;position:relative}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:8px}
+h1{font-family:'Outfit',sans-serif;font-size:26px;font-weight:700;color:#fff;line-height:1.2}
+.sub{font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+.hero-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.cd{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,.6)}
+.cd b{font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+.cd b.urg{color:#FF7B7B;animation:blink 1s ease-in-out infinite}
+@keyframes blink{50%{opacity:.55}}
+.hbtns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.bt{font-size:13px;padding:8px 14px;border:.5px solid var(--bd2);border-radius:var(--r);background:var(--sf);color:var(--tx);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.bt:hover{background:var(--sf2)}
+.bt.red,.bt.pri{background:var(--red);border-color:var(--red);color:#fff;font-weight:600}
+.bt.red:hover,.bt.pri:hover{background:#aa0000}
+.bt.ghost{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.22);color:#fff}
+.bt.ghost:hover{background:rgba(255,255,255,.16)}
+.bt.dng{background:#CC0000;border-color:#CC0000;color:#fff;font-weight:600}
+.bt:disabled{opacity:.5;cursor:not-allowed}
+.mini{font-size:11px;padding:4px 9px;border:.5px solid var(--bd2);border-radius:var(--r);background:transparent;color:var(--mu);align-items:center;gap:4px}
+.mini:hover{background:var(--sf2)}
+.mini.gr:hover{background:#EAF3DE;color:#27500A;border-color:#27500A}
+.mini.rd:hover{background:#FAECE7;color:#712B13;border-color:#712B13}
+.motiv{margin-top:12px;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border-radius:var(--r);padding:9px 14px;color:#fff;font-size:13px;font-style:italic;position:relative}
+.motiv i{color:rgba(255,255,255,.55);font-size:16px}
+.motiv span{flex:1}
+.motiv .mini{color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.3);font-style:normal}
+/* layout */
+.main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:860px){.main{grid-template-columns:minmax(0,1fr)}.hero-right{align-items:flex-start}.hbtns{justify-content:flex-start}}
+.card{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--rl);padding:14px 16px}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.ct{font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:6px}
+.cs{font-size:12px;color:var(--fa)}
+.side{display:flex;flex-direction:column;gap:14px}
+/* podium */
+.pod{display:flex;align-items:flex-end;justify-content:center;gap:10px;height:150px;margin:4px 0 10px}
+.pc{display:flex;flex-direction:column;align-items:center;gap:3px;width:30%;max-width:150px}
+.pc .nm{font-size:12px;font-weight:500;text-align:center}
+.pb{width:100%;border-radius:10px 10px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:6px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700}
+.crown{font-size:20px;color:#C8950A;animation:fl 2s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-3px)}}
+/* ranking */
+.rw{display:grid;grid-template-columns:30px 36px minmax(0,1fr) 90px 82px;align-items:center;gap:10px;padding:10px 4px;border-top:.5px solid var(--bd);transition:background .15s}
+.rw:hover{background:var(--sf2)}
+.rn{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;color:var(--fa);text-align:center}
+.av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;flex-shrink:0}
+.av.s{width:28px;height:28px;font-size:10px}
+.av-jane{background:#E6F1FB;color:#0C447C}.av-lucas{background:#EAF3DE;color:#27500A}.av-ana{background:#FAECE7;color:#712B13}.av-larissa{background:#EEEDFE;color:#3C3489}.av-arthur{background:#FEF0E6;color:#93340A}.av-breno{background:#DDEEDD;color:#145214}.av-evelyn{background:#EDE0F5;color:#5B2D8E}
+.pn{font-size:14px;font-weight:500}
+.pa{font-size:11px;color:var(--mu);background:var(--sf2);padding:1px 7px;border-radius:9px;display:inline-block;margin-top:2px}
+.pt{font-size:11px;color:var(--red);font-weight:500;display:block;margin-top:2px}
+.bar{height:6px;background:var(--sf2);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px;transition:width .8s ease}
+.b-jane{background:#378ADD}.b-lucas{background:#639922}.b-ana{background:#D85A30}.b-larissa{background:#7F77DD}.b-arthur{background:#E8720C}.b-breno{background:#2D8A2D}.b-evelyn{background:#9B59D0}
+.pp{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+.pp b{font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.pp small{font-size:11px;color:var(--fa)}
+@media(max-width:560px){.rw{grid-template-columns:24px 32px minmax(0,1fr) 70px}.rw .bar{display:none}}
+/* side cards */
+.big{font-family:'Outfit',sans-serif;font-size:26px;font-weight:700;line-height:1.1}
+.mu{font-size:12px;color:var(--mu)}
+.prog{height:9px;background:var(--sf2);border-radius:5px;overflow:hidden;margin:8px 0 6px}
+.prog i{display:block;height:100%;border-radius:5px;transition:width .6s ease}
+.st{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:500;display:inline-block;margin-top:6px}
+.st.ok{background:#EAF3DE;color:#27500A}.st.wn{background:#FEF3C7;color:#92400E}.st.rk{background:#FAECE7;color:#712B13}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kc{background:var(--sf2);border-radius:var(--r);padding:8px 10px}
+.kc span{display:block;font-size:11px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kc b{font-family:'Outfit',sans-serif;font-size:20px;font-weight:700}
+.kc b.t1{color:#CC0000}.kc b.t2{color:#E8720C}
+.msel{width:100%;font-size:12px;padding:6px 8px;border:.5px solid var(--bd2);border-radius:var(--r);background:var(--sf);color:var(--tx);font-family:'Inter',sans-serif;margin-bottom:10px}
+/* tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0 10px}
+.tab{font-size:13px;padding:7px 14px;border:.5px solid var(--bd2);border-radius:20px;background:var(--sf);color:var(--mu);display:inline-flex;align-items:center;gap:6px}
+.tab:hover{background:var(--sf2)}
+.tab.on{background:var(--dark);border-color:var(--dark);color:#fff}
+.cnt{font-size:11px;padding:0 7px;border-radius:10px;background:var(--red);color:#fff;font-weight:600}
+.panel{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--rl);padding:6px 16px}
+.it{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:.5px solid var(--bd);font-size:13px;flex-wrap:wrap}
+.it:first-child{border-top:none}
+.it .grow{flex:1;min-width:150px}
+.it small{display:block;font-size:11px;color:var(--mu)}
+.it .why{color:#CC0000}
+.ip{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;white-space:nowrap}
+.lk{font-size:11px;color:var(--blue);text-decoration:none;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.lk:hover{text-decoration:underline}
+.dt{font-size:11px;color:var(--fa);white-space:nowrap}
+.dup{font-size:10px;padding:2px 8px;border-radius:10px;background:#FEF3C7;color:#92400E;border:.5px solid #F59E0B;display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.dupr{background:#FFFBEB;margin:0 -16px;padding-left:16px;padding-right:16px}
+.empty{font-size:13px;color:var(--fa);padding:22px 0;text-align:center}
+.pills{display:flex;gap:6px;flex-wrap:wrap;padding:12px 0 4px}
+.pill{font-size:11px;padding:4px 10px;border:.5px solid var(--bd2);border-radius:20px;background:var(--sf);color:var(--mu)}
+.pill.on{background:var(--dark);color:#fff;border-color:var(--dark)}
+/* pontos */
+.lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;padding:14px 0}
+.li{background:var(--sf);border:.5px solid var(--bd);border-radius:var(--r);padding:11px 13px;display:flex;align-items:center;gap:10px}
+.li.t1{border:1.5px solid #CC0000}.li.t1 .ln{color:#CC0000}
+.li.t2{border:1px solid #E8720C}.li.t2 .ln{color:#E8720C}
+.le{font-size:20px;display:inline-block}
+.li.t1 .le{animation:p1 1.8s ease-in-out infinite}
+.li.t2 .le{animation:p2 2.2s ease-in-out infinite}
+@keyframes p1{50%{transform:scale(1.25);filter:drop-shadow(0 0 6px rgba(204,0,0,.5))}}
+@keyframes p2{50%{transform:scale(1.2) rotate(-8deg);filter:drop-shadow(0 0 5px rgba(232,114,12,.45))}}
+.lt b{font-size:13px;font-weight:500;display:block}.lt span{font-size:11px;color:var(--mu)}
+.lp{margin-left:auto;text-align:right}.ln{font-family:'Outfit',sans-serif;font-size:20px;font-weight:700;color:var(--dark);line-height:1}.lp small{font-size:10px;color:var(--fa)}
+/* receita diaria */
+.dr{display:grid;grid-template-columns:56px minmax(0,1fr) 110px auto;align-items:center;gap:10px;padding:9px 0;border-top:.5px solid var(--bd);font-size:13px}
+.dr:first-of-type{border-top:none}
+/* weeks */
+details{border-top:.5px solid var(--bd)}details:first-child{border-top:none}
+summary{list-style:none;cursor:pointer;padding:12px 0;display:flex;align-items:center;justify-content:space-between;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary b{font-family:'Outfit',sans-serif;font-size:14px;font-weight:600}
+.champ{display:flex;align-items:center;gap:10px;background:var(--dark);border-radius:var(--r);padding:9px 12px;margin-bottom:8px;color:#fff}
+.champ b{font-family:'Outfit',sans-serif;font-size:14px}.champ span{font-size:12px;color:rgba(255,255,255,.6)}
+.wr{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:.5px solid var(--bd);font-size:13px}
+/* modal + toasts */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,10,30,.5);align-items:center;justify-content:center;z-index:200;padding:12px}
+.mo.open{display:flex}
+.mdl{background:var(--sf);border-radius:var(--rl);padding:1.5rem;width:420px;max-width:100%;max-height:92vh;overflow:auto;box-shadow:0 16px 48px rgba(0,0,0,.2)}
+.mdl h2{font-family:'Outfit',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px}
+.mdl p.ms{font-size:13px;color:var(--mu);margin-bottom:14px}
+.mdl label{font-size:12px;color:var(--mu);display:block;margin:6px 0 3px}
+.mdl input,.mdl select,.mdl textarea{width:100%;font-size:14px;font-family:'Inter',sans-serif;border:.5px solid var(--bd2);border-radius:var(--r);padding:9px 12px;background:var(--sf);color:var(--tx);outline:none;margin-bottom:6px}
+.mdl input:focus,.mdl select:focus,.mdl textarea:focus{border-color:var(--blue)}
+.mdl textarea{resize:vertical}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.warn{font-size:12px;color:#92400E;background:#FEF3C7;border:.5px solid #F59E0B;border-radius:var(--r);padding:6px 10px;margin-bottom:8px}
+.ops{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0}
+.op{padding:9px;border:.5px solid var(--bd2);border-radius:var(--r);background:var(--sf2);font-size:13px;color:var(--tx)}
+.op.on{border-color:var(--blue);background:#E6F1FB;color:#0C447C}
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity .3s;z-index:999;pointer-events:none}
+.toast.show{opacity:1}
+.otoast{position:fixed;top:1.25rem;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-size:13px;padding:10px 20px;border-radius:20px;opacity:0;transition:opacity .4s;z-index:1000;pointer-events:none;white-space:nowrap;box-shadow:0 4px 24px rgba(0,0,0,.25)}
+.otoast.show{opacity:1}
+.spin{animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+</style>
 </head>
 <body>
-<div class="layout" id="pageWrap">
-
-  <!-- LEFT SIDEBAR: Indicadores do mês -->
-  <div class="sidebar" id="leftSidebar">
-    <div class="sidebar-card">
-      <div class="sidebar-title">
-        <span><i class="ti ti-chart-bar" style="font-size:13px"></i>Indicadores do mês</span>
-        <button class="edit-meta-btn" onclick="openModal('metaModal')" style="color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.3)"><i class="ti ti-pencil" style="font-size:11px"></i> Editar metas</button>
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="badge"><i class="ti ti-bolt"></i> Desafio ativo</div>
+        <h1>Operação Base Forte</h1>
+        <div class="sub">Desafio Força da Base · ranking em tempo real</div>
       </div>
-      <div style="margin-bottom:10px">
-        <select id="monthSelector" onchange="renderKPIs()" style="width:100%;font-size:12px;padding:5px 8px;border:0.5px solid var(--border-md);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:'Inter',sans-serif;outline:none">
-          <option value="current">Mês atual</option>
-        </select>
-      </div>
-      <div id="kpiList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i></div></div>
-    </div>
-
-    <div class="sidebar-card">
-      <div class="sidebar-title">
-        <span><i class="ti ti-stack-2" style="font-size:13px"></i>Ações por modalidade</span>
-      </div>
-      <div id="modalidadesList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i></div></div>
-    </div>
-  </div>
-
-  <!-- CENTER: Ranking principal -->
-  <div class="center">
-    <div class="header">
-      <div class="header-badge"><i class="ti ti-bolt" style="font-size:11px"></i> Desafio ativo</div>
-      <h1>Força da Base<br>Operação Base Forte</h1>
-      <p>Ranking atualizado em tempo real · Poste sua ação e aguarde validação</p>
-    </div>
-
-    <!-- Mensagem motivacional -->
-    <div class="motivational-bar" id="motivationalBar">
-      <i class="ti ti-speakerphone" style="font-size:16px;color:rgba(255,255,255,0.5);flex-shrink:0"></i>
-      <span class="motivational-text" id="motivationalText">Bora, time! Cada ação conta. 🚀</span>
-      <button class="motivational-edit" onclick="openModal('motivModal')"><i class="ti ti-pencil" style="font-size:11px"></i> Editar</button>
-    </div>
-
-    <!-- Countdown -->
-    <div class="countdown-bar">
-      <div class="countdown-label"><i class="ti ti-clock" style="font-size:13px"></i> Tempo para encerrar a semana</div>
-      <div class="countdown-timer" id="countdownTimer">—</div>
-    </div>
-
-    <div class="admin-bar">
-      <div class="admin-input-wrap"><i class="ti ti-lock"></i><input type="password" id="adminPwInput" placeholder="Senha de administrador..." onkeydown="if(event.key==='Enter')tryAdmin()" /></div>
-      <button class="admin-btn" onclick="tryAdmin()"><i class="ti ti-shield-check"></i> Entrar</button>
-      <div id="adminStatus"></div>
-    </div>
-
-    <div class="stats-grid">
-      <div class="stat-card"><div class="stat-label">Total de pontos</div><div class="stat-value" id="statTotal">—</div><div class="stat-sub">semana atual</div></div>
-      <div class="stat-card"><div class="stat-label">Ações validadas</div><div class="stat-value" id="statActions">—</div><div class="stat-sub">semana atual</div></div>
-      <div class="stat-card"><div class="stat-label">Líder atual</div><div class="stat-value" id="statLeader" style="font-size:17px;padding-top:3px">—</div><div class="stat-sub" id="statLeaderPts"></div></div>
-    </div>
-
-    <div class="section-header">
-      <div class="section-title" style="margin-bottom:0">Ranking — semana atual</div>
-      <div class="section-header-btns">
-        <button class="admin-week-btn gray" onclick="openModal('zeroDayModal')"><i class="ti ti-trash"></i> Zerar hoje</button>
-        <button class="admin-week-btn red" onclick="openModal('weekModal')"><i class="ti ti-flag"></i> Encerrar semana</button>
-        <button class="admin-week-btn red" style="border-color:#7F77DD;color:#7F77DD" onclick="openModal('monthModal')"><i class="ti ti-calendar-event"></i> Encerrar mês</button>
+      <div class="hero-right">
+        <div class="cd"><i class="ti ti-clock"></i><span>Semana encerra em</span><b id="cd">--</b></div>
+        <div class="hbtns">
+          <button class="bt red" onclick="openReg()"><i class="ti ti-plus"></i> Registrar ação</button>
+          <button class="bt ghost" onclick="load(true)" aria-label="Atualizar dados"><i class="ti ti-refresh" id="rfi"></i></button>
+          <button class="bt ghost" id="lockbtn" onclick="lockClick()"><i class="ti ti-lock" id="locki"></i> <span id="lockt">Gestor</span></button>
+        </div>
       </div>
     </div>
-    <div class="card" id="rankingCard"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
+    <div class="motiv"><i class="ti ti-speakerphone"></i><span id="motiv">Bora, time! Cada ação conta. 🚀</span><button class="mini adm" onclick="openMotiv()"><i class="ti ti-pencil"></i> Editar</button></div>
+  </header>
 
-    <div class="section-title">Tabela de pontos</div>
-    <div class="legend-grid">
-      <div class="legend-item legend-tier-1"><span class="legend-emoji">🔄</span><div><div class="legend-name">Recuperação</div><div class="legend-desc">50+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">60</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item legend-tier-2"><span class="legend-emoji">⚡</span><div><div class="legend-name">Reativação</div><div class="legend-desc">30+ dias atrasado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">50</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item legend-tier-2"><span class="legend-emoji">🤝</span><div><div class="legend-name">Indicação gerada</div><div class="legend-desc">Cliente indicou outro</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item legend-tier-2"><span class="legend-emoji">⏫</span><div><div class="legend-name">Upgrade de duração</div><div class="legend-desc">Mensal → Anual</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item"><span class="legend-emoji">⏫</span><div><div class="legend-name">Upgrade de duração</div><div class="legend-desc">Trimestral → Semestral</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item"><span class="legend-emoji">⏫</span><div><div class="legend-name">Upgrade de duração</div><div class="legend-desc">Semestral → Anual</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item"><span class="legend-emoji">📈</span><div><div class="legend-name">Upgrade de plano</div><div class="legend-desc">Bronze → Prata etc.</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item"><span class="legend-emoji">➕</span><div><div class="legend-name">Upsell add-on</div><div class="legend-desc">Por cliente</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">25</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item"><span class="legend-emoji">🛡️</span><div><div class="legend-name">Retenção (churn)</div><div class="legend-desc">Cliente salvo</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">30</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item"><span class="legend-emoji">📅</span><div><div class="legend-name">Antecipação de renovação</div><div class="legend-desc">Antes do vencimento</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">10</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item"><span class="legend-emoji">💎</span><div><div class="legend-name">Plano acima de R$3k</div><div class="legend-desc">Por contrato fechado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">20</div><div class="legend-pts-lbl">pts</div></div></div>
-      <div class="legend-item legend-tier-2"><span class="legend-emoji">💎</span><div><div class="legend-name">Plano acima de R$6k</div><div class="legend-desc">Por contrato fechado</div></div><div class="legend-pts-wrap"><div class="legend-pts-num">40</div><div class="legend-pts-lbl">pts</div></div></div>
-    </div>
-
-    <div class="section-title">Ações pendentes de validação</div>
-    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
-      <button class="add-btn" style="margin-bottom:0" onclick="openModal('modalOverlay')"><i class="ti ti-plus"></i> Registrar nova ação</button>
-      <button class="refresh-btn" onclick="loadData(true)"><i class="ti ti-refresh" id="refreshIcon"></i> Atualizar</button>
-    </div>
-    <div class="pending-list" id="pendingList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
-
-    <div class="collapsible-header" onclick="toggleSection('historySection','historyChevron')">
-      <div class="section-title" style="margin-top:0;margin-bottom:0">Histórico da semana atual</div>
-      <button class="collapse-btn" id="historyChevron"><i class="ti ti-chevron-up" style="font-size:12px"></i> Minimizar</button>
-    </div>
-    <div class="collapsible-body" id="historySection" style="max-height:2000px">
-      <div class="filter-bar" id="historyFilter">
-        <button class="filter-btn active" onclick="setFilter('all')" id="filter-all">Todos</button>
-        <button class="filter-btn" onclick="setFilter('jane')" id="filter-jane">Jane</button>
-        <button class="filter-btn" onclick="setFilter('lucas')" id="filter-lucas">Lucas</button>
-        <button class="filter-btn" onclick="setFilter('ana')" id="filter-ana">Ana Luiza</button>
-        <button class="filter-btn" onclick="setFilter('larissa')" id="filter-larissa">Larissa</button>
-        <button class="filter-btn" onclick="setFilter('arthur')" id="filter-arthur">Arthur</button>
-      <button class="filter-btn" onclick="setFilter('breno')" id="filter-breno">Breno</button>
-      <button class="filter-btn" onclick="setFilter('evelyn')" id="filter-evelyn">Evelyn</button>
+  <div class="main">
+    <section class="card">
+      <div class="ch">
+        <div><div class="ct"><i class="ti ti-trophy"></i> Ranking da semana</div><div class="cs" id="rsub"></div></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="mini adm" onclick="openZero()"><i class="ti ti-trash"></i> Zerar hoje</button>
+          <button class="mini adm" style="color:#CC0000;border-color:#CC0000" onclick="openWeek()"><i class="ti ti-flag"></i> Encerrar semana</button>
+          <button class="mini adm" style="color:#7F77DD;border-color:#7F77DD" onclick="openMonth()"><i class="ti ti-calendar-event"></i> Encerrar mês</button>
+        </div>
       </div>
-      <div class="history-list" id="historyList"><div class="loading-overlay"><i class="ti ti-loader spinning"></i> Carregando...</div></div>
-    </div>
-
-    <div class="collapsible-header" onclick="toggleSection('deniedSection','deniedChevron')">
-      <div class="section-title" style="margin-top:0;margin-bottom:0">Ações negadas</div>
-      <button class="collapse-btn" id="deniedChevron"><i class="ti ti-chevron-up" style="font-size:12px"></i> Minimizar</button>
-    </div>
-    <div class="collapsible-body" id="deniedSection" style="max-height:2000px">
-      <div class="denied-list" id="deniedList"><div class="empty-state">Nenhuma ação negada.</div></div>
-    </div>
-
-    <div class="collapsible-header" onclick="toggleSection('weeksSection','weeksChevron')">
-      <div class="section-title" style="margin-top:0;margin-bottom:0">Semanas anteriores</div>
-      <button class="collapse-btn" id="weeksChevron"><i class="ti ti-chevron-up" style="font-size:12px"></i> Minimizar</button>
-    </div>
-    <div class="collapsible-body" id="weeksSection" style="max-height:2000px">
-      <div id="weeksList"><div class="empty-state">Nenhuma semana encerrada ainda.</div></div>
-    </div>
+      <div class="pod" id="pod"></div>
+      <div id="rk"><div class="empty"><i class="ti ti-loader spin"></i> Carregando...</div></div>
+    </section>
+    <aside class="side" id="side"></aside>
   </div>
 
-  <!-- RIGHT SIDEBAR: Histórico diário de receita/vendas -->
-  <div class="sidebar" id="rightSidebar">
-    <div class="sidebar-card">
-      <div class="sidebar-title">
-        <span><i class="ti ti-calendar-stats" style="font-size:13px;margin-right:4px"></i>Receita / Vendas diária</span>
-        <button class="add-day-btn" style="display:none;width:auto;margin:0;padding:3px 8px;font-size:11px;border-style:solid" onclick="openModal('dayModal')"><i class="ti ti-plus" style="font-size:11px"></i></button>
-      </div>
-      <div id="dailyHistoryList"><div class="empty-state">Nenhum registro ainda.</div></div>
-      <button class="add-day-btn" onclick="openModal('dayModal')">+ Adicionar dia</button>
-    </div>
-  </div>
-
+  <nav class="tabs" id="tabs"></nav>
+  <section class="panel" id="panel"></section>
 </div>
 
-<div class="overtake-toast" id="overtakeToast"></div>
-
-<!-- Modal mensagem motivacional -->
-<div class="modal-overlay" id="motivModal">
-  <div class="modal">
-    <h2>Mensagem motivacional</h2>
-    <p>Esta mensagem aparece no topo do painel para todo o time.</p>
-    <textarea id="motivText" rows="3" placeholder="Ex: Bora time! Cada ação conta. 🚀"></textarea>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('motivModal')">Cancelar</button>
-      <button class="btn-confirm" onclick="confirmMotiv()">Publicar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal registrar ação -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h2>Registrar ação</h2>
-    <p>Preencha os dados abaixo. Sua ação ficará pendente até ser validada pelo administrador.</p>
-    <select id="modalPlayer">
-      <option value="">Participante...</option>
-      <option value="jane">Jane (camisa 10)</option>
-      <option value="lucas">Lucas Neiva (Mineirinho)</option>
-      <option value="ana">Ana Luiza (Incendiária)</option>
-      <option value="larissa">Larissa (BOPE)</option>
-      <option value="arthur">Arthur (Aspira)</option>
-      <option value="breno">Breno (B2)</option>
-      <option value="evelyn">Evelyn (Eve)</option>
-    </select>
-    <select id="modalAction">
-      <option value="">Tipo de ação...</option>
-      <option value="50">⚡ Reativação (30+ dias) — 50 pts</option>
-      <option value="60">🔄 Recuperação (50+ dias) — 60 pts</option>
-      <option value="30">📈 Upgrade de plano — 30 pts</option>
-      <option value="40">⏫ Upgrade de duração (mensal → anual) — 40 pts</option>
-      <option value="30ts">⏫ Upgrade de duração (trimestral → semestral) — 30 pts</option>
-      <option value="30sa">⏫ Upgrade de duração (semestral → anual) — 30 pts</option>
-      <option value="25u">➕ Upsell add-on — 25 pts</option>
-      <option value="30r">🛡️ Retenção (churn) — 30 pts</option>
-      <option value="40i">🤝 Indicação gerada — 40 pts</option>
-      <option value="10a">📅 Antecipação de renovação — 10 pts</option>
-      <option value="20k">💎 Plano acima de R$3k — 20 pts</option>
-      <option value="40k">💎 Plano acima de R$6k — 40 pts</option>
-    </select>
-    <input type="text" id="modalLink" placeholder="Link da intranet (obrigatório)" oninput="checkDuplicate(this.value)" />
-    <div id="dupWarning" class="dup-warning" style="display:none"></div>
-    <div class="link-hint">Cole o link da intranet para que o administrador possa validar.</div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('modalOverlay')">Cancelar</button>
-      <button class="btn-confirm" id="btnConfirmAction" onclick="confirmAction()">Enviar para validação</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal negar ação -->
-<div class="modal-overlay" id="denyModal">
-  <div class="modal">
-    <h2>Negar ação</h2>
-    <p>Informe o motivo da negação. O participante poderá visualizar no painel.</p>
-    <textarea id="denyReason" rows="3" placeholder="Ex: Link inválido, ação não encontrada no CRM..."></textarea>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('denyModal')">Cancelar</button>
-      <button class="btn-danger" id="btnConfirmDeny" onclick="confirmDeny()"><i class="ti ti-x"></i> Confirmar negação</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal editar metas -->
-<div class="modal-overlay" id="metaModal">
-  <div class="modal">
-    <h2>Editar metas do mês</h2>
-    <p>Defina as metas mensais para cada indicador.</p>
-    <div id="metaFields"></div>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('metaModal')">Cancelar</button>
-      <button class="btn-confirm" id="btnConfirmMeta" onclick="confirmMeta()">Salvar metas</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal adicionar dia (receita/vendas) -->
-<div class="modal-overlay" id="dayModal">
-  <div class="modal">
-    <h2>Registrar resultado do dia</h2>
-    <p>Informe a data e os valores de receita e vendas do dia.</p>
-    <input type="date" id="dayDate" />
-    <input type="number" id="dayReceita" placeholder="Receita do dia (R$)" min="0" />
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('dayModal')">Cancelar</button>
-      <button class="btn-confirm" id="btnConfirmDay" onclick="confirmDay()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal zerar hoje -->
-<div class="modal-overlay" id="zeroDayModal">
-  <div class="modal">
-    <h2>Zerar registros de hoje</h2>
-    <p>Remove do histórico e estorna dos pontos todas as ações validadas hoje. Esta ação não pode ser desfeita.</p>
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('zeroDayModal')">Cancelar</button>
-      <button class="btn-danger" id="btnConfirmZeroDay" onclick="confirmZeroDay()"><i class="ti ti-trash"></i> Zerar hoje</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal encerrar mês -->
-<div class="modal-overlay" id="monthModal">
-  <div class="modal">
-    <h2>Encerrar mês</h2>
-    <p>Salva o ranking, modalidades e receita do mês atual para consulta futura e <strong>zera os pontos, histórico e receita diária</strong> para começar o próximo mês. Esta ação não pode ser desfeita.</p>
-    <input type="text" id="monthLabel" placeholder="Nome do mês (ex: Setembro 2026)" />
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('monthModal')">Cancelar</button>
-      <button class="btn-danger" id="btnConfirmMonth" onclick="confirmCloseMonth()" style="background:#7F77DD"><i class="ti ti-calendar-event"></i> Salvar snapshot</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal encerrar semana -->
-<div class="modal-overlay" id="weekModal">
-  <div class="modal">
-    <h2>Encerrar semana</h2>
-    <p>O ranking atual será salvo no histórico e os pontos serão zerados. Esta ação não pode ser desfeita.</p>
-    <input type="text" id="weekLabel" placeholder="Nome da semana (ex: Semana 1 — 02/06 a 06/06)" />
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('weekModal')">Cancelar</button>
-      <button class="btn-danger" id="btnConfirmWeek" onclick="confirmCloseWeek()"><i class="ti ti-flag"></i> Encerrar e zerar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal editar pontos -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <h2>Editar pontos</h2>
-    <p>Ajuste manualmente os pontos do participante.</p>
-    <div class="edit-player-header" id="editPlayerHeader"></div>
-    <div class="edit-current">Pontos atuais: <span id="editCurrentPts">0</span></div>
-    <div class="edit-ops">
-      <button class="edit-op-btn selected" id="opAdd" onclick="selectOp('add')">+ Adicionar</button>
-      <button class="edit-op-btn" id="opRemove" onclick="selectOp('remove')">− Remover</button>
-      <button class="edit-op-btn" id="opSet" onclick="selectOp('set')">= Definir</button>
-    </div>
-    <input type="number" id="editPtsValue" placeholder="Quantidade de pontos..." min="0" />
-    <div class="modal-actions">
-      <button class="btn-cancel" onclick="closeModal('editModal')">Cancelar</button>
-      <button class="btn-confirm" id="btnConfirmEdit" onclick="confirmEdit()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
+<div class="mo" id="mo"><div class="mdl"><h2 id="mt"></h2><p class="ms" id="ms"></p><div id="mb"></div><div class="mfoot"><button class="bt" onclick="closeM()">Cancelar</button><button class="bt pri" id="mok"></button></div></div></div>
+<div class="otoast" id="ot"></div>
+<div class="toast" id="tt"></div>
 
 <script>
-const ADMIN_PASS = '2355';
-const playersMeta = {
-  jane:    { name:'Jane',        alias:'camisa 10',   av:'JA', cls:'av-jane',    bar:'bar-jane'    },
-  lucas:   { name:'Lucas Neiva', alias:'Mineirinho',  av:'LN', cls:'av-lucas',   bar:'bar-lucas'   },
-  ana:     { name:'Ana Luiza',   alias:'Incendiária', av:'AL', cls:'av-ana',     bar:'bar-ana'     },
-  larissa: { name:'Larissa',     alias:'BOPE',        av:'LA', cls:'av-larissa', bar:'bar-larissa' },
-  arthur:  { name:'Arthur',      alias:'Aspira',      av:'AR', cls:'av-arthur',  bar:'bar-arthur'  },
-  breno:   { name:'Breno',       alias:'B2',          av:'BR', cls:'av-breno',   bar:'bar-breno'   },
-  evelyn:  { name:'Evelyn',      alias:'Eve',         av:'EV', cls:'av-evelyn',  bar:'bar-evelyn'  },
+const ADMIN_PASS='2355';
+const PL={
+  jane:{n:'Jane',a:'camisa 10',i:'JA'},lucas:{n:'Lucas Neiva',a:'Mineirinho',i:'LN'},ana:{n:'Ana Luiza',a:'Incendiária',i:'AL'},
+  larissa:{n:'Larissa',a:'BOPE',i:'LA'},arthur:{n:'Arthur',a:'Cocoricó',i:'AR'},breno:{n:'Breno',a:'Sangue nos zói',i:'BR'},evelyn:{n:'Evelyn',a:'Eve',i:'EV'}
 };
-const actionLabels = {
-  '50':'⚡ Reativação (30+ dias)','60':'🔄 Recuperação (50+ dias)',
-  '25u':'➕ Upsell add-on','30r':'🛡️ Retenção (churn)','40i':'🤝 Indicação gerada','10a':'📅 Antecipação de renovação',
-  '30ts':'⏫ Upgrade duração (tri→sem)','30sa':'⏫ Upgrade duração (sem→anual)',
-  '20k':'💎 Plano acima de R$3k','40k':'💎 Plano acima de R$6k',
+const ACT={
+ '60':{e:'🔄',l:'Recuperação (50+ dias)',s:'Recuperação',d:'50+ dias atrasado',p:60,tier:1,t:'Mestre da Ressurreição'},
+ '50':{e:'⚡',l:'Reativação (30+ dias)',s:'Reativação',d:'30+ dias atrasado',p:50,tier:2,t:'Caçador(a) de Inativos'},
+ '40i':{e:'🤝',l:'Indicação gerada',s:'Indicação',d:'Cliente indicou outro',p:40,tier:2,t:'Embaixador(a)'},
+ '40':{e:'⏫',l:'Upgrade de duração (mensal → anual)',s:'Upg. mensal→anual',d:'Mensal → Anual',p:40,tier:2,t:'Fidelizador(a)'},
+ '40k':{e:'💎',l:'Plano acima de R$6k',s:'Plano +6k',d:'Por contrato fechado',p:40,tier:2,t:'Ticket Premium'},
+ '30':{e:'📈',l:'Upgrade de plano',s:'Upgrade de plano',d:'Bronze → Prata etc.',p:30,t:'Sobe Patente'},
+ '30ts':{e:'⏫',l:'Upgrade de duração (trimestral → semestral)',s:'Upg. tri→sem',d:'Trimestral → Semestral',p:30,t:'Fidelizador(a)'},
+ '30sa':{e:'⏫',l:'Upgrade de duração (semestral → anual)',s:'Upg. sem→anual',d:'Semestral → Anual',p:30,t:'Fidelizador(a)'},
+ '30r':{e:'🛡️',l:'Retenção (churn)',s:'Retenção',d:'Cliente salvo',p:30,t:'Muralha'},
+ '25u':{e:'➕',l:'Upsell add-on',s:'Upsell add-on',d:'Por cliente',p:25,t:'Rei/Rainha dos Upsells'},
+ '20k':{e:'💎',l:'Plano acima de R$3k',s:'Plano +3k',d:'Por contrato fechado',p:20,t:'Ticket Alto'},
+ '10a':{e:'📅',l:'Antecipação de renovação',s:'Antecipação',d:'Antes do vencimento',p:10,t:'Antecipador(a)'}
 };
-const ptsMap = {'50':50,'60':60,'30':30,'40':40,'25u':25,'30r':30,'40i':40,'10a':10,'30ts':30,'30sa':30,'20k':20,'40k':40};
-const titleMap = {
-  '50':'⚡ Caçador(a) de Inativos','60':'🔄 Mestre da Ressurreição',
-  '30':'📈 Sobe Patente','40':'⏫ Fidelizador(a)','40i':'🤝 Embaixador(a)',
-  '25u':'➕ Rei/Rainha dos Upsells','30r':'🛡️ Muralha','10a':'📅 Antecipador(a)',
-  '30ts':'⏫ Fidelizador(a)','30sa':'⏫ Fidelizador(a)','20k':'💎 Ticket Alto','40k':'💎 Ticket Premium',
-};
+const LEG={'30u':['Upsell add-on',30,'25u'],'25':['Upsell add-on',25,'25u'],'20':['Retenção (churn)',20,'30r'],'18':['Renovação',18,null],'10':['Atividade comercial',10,null],'15':['Avaliação no Google',15,null]};
+const UPG=['30','40','30ts','30sa'];
 
-// KPI types que são puxados do histórico
-const KPI_UPSELL_KEYS = ['25u'];
-const KPI_UPGRADE_KEYS = ['30','40'];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl=u=>/^https?:\/\//i.test(String(u||'').trim())?esc(String(u).trim()):'';
+const brl=v=>'R$\u00a0'+Math.round(Number(v)||0).toLocaleString('pt-BR');
+const num=v=>Math.round(Number(v)||0).toLocaleString('pt-BR');
+const canon=k=>{k=String(k);return ACT[k]?k:(LEG[k]?LEG[k][2]:null)};
+const ptsOf=k=>{k=String(k);return ACT[k]?ACT[k].p:(LEG[k]?LEG[k][1]:(parseInt(k)||0))};
+const lbl=it=>it.label||(ACT[String(it.pts)]?ACT[String(it.pts)].l:(LEG[String(it.pts)]?LEG[String(it.pts)][0]:'Ação de '+ptsOf(it.pts)+' pts'));
+const emo=it=>{const c=canon(it.pts);return c?ACT[c].e:'•'};
+const hpts=h=>Number(h.resolvedPts)>0?Number(h.resolvedPts):ptsOf(h.pts);
+const fdt=iso=>iso?new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+const av=(k,s)=>`<div class="av ${s?'s ':''}av-${k}">${PL[k].i}</div>`;
+const mname=()=>{const t=new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});return t.charAt(0).toUpperCase()+t.slice(1)};
 
-function getLabel(pts) { return actionLabels[String(pts)] || `+${ptsMap[String(pts)]||parseInt(pts)||0} pts`; }
-function getPoints(v) { return ptsMap[String(v)] ?? parseInt(v) ?? 0; }
-function fmtDate(iso) { return iso ? new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : ''; }
-function fmtBRL(v) { return 'R$\u00a0' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+let S={points:{},pending:[],validated:0,history:[],weeks:[],denied:[],metas:{receita:0,time:0},dailyHistory:[],motiv:'',monthHistory:[]};
+let admin=false,tab='pend',hFilter='all',selMonth='cur',prevOrder=[],first=true,tT,oT,opSel='add',editK=null;
 
-function calcTitle(playerKey, history) {
-  const counts = {};
-  (history||[]).filter(h=>h.playerKey===playerKey).forEach(h=>{ const k=String(h.pts); counts[k]=(counts[k]||0)+1; });
-  if (!Object.keys(counts).length) return null;
-  const top = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0][0];
-  return titleMap[top]||null;
+function toast(m){const t=$('tt');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2600)}
+function otoast(m){const t=$('ot');t.textContent=m;t.classList.add('show');clearTimeout(oT);oT=setTimeout(()=>t.classList.remove('show'),4000)}
+async function api(action,payload){const r=await fetch('/api/save-data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,payload})});if(!r.ok){const e=new Error(r.status===404?'Essa ação já foi tratada.':'Erro ao salvar.');e.status=r.status;throw e}return r.json()}
+const order=pts=>Object.keys(PL).sort((a,b)=>(Number(pts[b])||0)-(Number(pts[a])||0));
+
+async function load(manual){
+  if(manual)$('rfi').classList.add('spin');
+  try{
+    const r=await fetch('/api/get-data');if(!r.ok)throw new Error();
+    const d=await r.json();
+    const o=order(d.points||{});
+    if(!first&&prevOrder.length)o.forEach((k,i)=>{const p=prevOrder.indexOf(k);if(p>i)otoast('🔺 '+PL[k].n+' ultrapassou '+PL[prevOrder[i]].n+'! 🔥')});
+    prevOrder=o;
+    S={...S,...d};S.metas={receita:0,time:0,...(d.metas||{})};
+    if(d.motiv)$('motiv').textContent=d.motiv;
+    if(manual)toast('Dados atualizados!');
+  }catch(e){console.error(e);if(manual)toast('Não foi possível atualizar.')}
+  $('rfi').classList.remove('spin');
+  first=false;renderAll();
+}
+function renderAll(){rRank();rSide();rTabs();rPanel()}
+
+/* ---------- ranking ---------- */
+function calcTitle(k){
+  const c={};S.history.filter(h=>h.playerKey===k).forEach(h=>{const ck=canon(h.pts);if(ck)c[ck]=(c[ck]||0)+1});
+  const e=Object.entries(c).sort((a,b)=>b[1]-a[1]);return e.length?ACT[e[0][0]].e+' '+ACT[e[0][0]].t:null;
+}
+function rRank(){
+  const pts=S.points||{},o=order(pts),max=Math.max(...o.map(k=>Number(pts[k])||0),1);
+  const tot=o.reduce((s,k)=>s+(Number(pts[k])||0),0);
+  $('rsub').textContent=num(tot)+' pts · '+(S.validated||0)+' ações validadas';
+  const H=[96,126,74],C=[['#F0F2F6','#444'],['#FAEEDA','#854F0B'],['#FAECE7','#712B13']],sl=[o[1],o[0],o[2]];
+  $('pod').innerHTML=sl.map((k,i)=>`<div class="pc">${i===1?'<i class="ti ti-crown crown"></i>':''}${av(k)}<span class="nm">${PL[k].n.split(' ')[0]}</span><div class="pb" style="height:${H[i]}px;background:${C[i][0]};color:${C[i][1]}">${num(pts[k])}</div></div>`).join('');
+  $('rk').innerHTML=o.map((k,i)=>{
+    const p=PL[k],t=calcTitle(k),v=Number(pts[k])||0;
+    return `<div class="rw"><div class="rn">${i+1}</div>${av(k)}<div style="min-width:0"><div class="pn">${p.n}</div><span class="pa">${esc(p.a)}</span>${t?`<span class="pt">${t}</span>`:''}</div><div class="bar"><i class="b-${k}" style="width:${Math.round(v/max*100)}%"></i></div><div class="pp"><div><b>${num(v)}</b><small> pts</small></div><button class="mini adm" onclick="openEdit('${k}')" aria-label="Editar pontos de ${p.n}"><i class="ti ti-pencil"></i></button></div></div>`;
+  }).join('');
 }
 
-// Days in current month for projection
-function diasUteisNoMes() {
-  const hoje = new Date();
-  const ano = hoje.getFullYear(), mes = hoje.getMonth();
-  const total = new Date(ano, mes+1, 0).getDate();
-  let uteis = 0, decorridos = 0;
-  for (let d=1; d<=total; d++) {
-    const dow = new Date(ano,mes,d).getDay();
-    if (dow!==0&&dow!==6) { uteis++; if(d<=hoje.getDate()) decorridos++; }
+/* ---------- lateral ---------- */
+function bd(){const n=new Date(),y=n.getFullYear(),m=n.getMonth(),t=new Date(y,m+1,0).getDate();let u=0,c=0;for(let d=1;d<=t;d++){const w=new Date(y,m,d).getDay();if(w!==0&&w!==6){u++;if(d<=n.getDate())c++}}return{u,c:Math.max(c,1)}}
+function monthCounts(){
+  const c={},add=h=>{const k=canon(h.pts);if(k)c[k]=(c[k]||0)+1},n=new Date();
+  S.history.forEach(add);
+  S.weeks.forEach(w=>{if(!w.closedAt)return;const d=new Date(w.closedAt);if(d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear())(w.history||[]).forEach(add)});
+  return c;
+}
+function snapCounts(raw){const c={};Object.entries(raw||{}).forEach(([k,v])=>{const ck=canon(k);if(ck)c[ck]=(c[ck]||0)+Number(v)});return c}
+function modGrid(c){return `<div class="g2">${Object.keys(ACT).map(k=>`<div class="kc"><span>${ACT[k].e} ${ACT[k].s}</span><b class="${ACT[k].tier===1?'t1':ACT[k].tier===2?'t2':''}">${c[k]||0}</b></div>`).join('')}</div>`}
+function recCard(rec,meta,label,snap){
+  const pr=snap?rec:rec*bd().u/bd().c,pc=meta>0?Math.round(pr/meta*100):0;
+  const cls=pc>=90?'ok':pc>=60?'wn':'rk',tx=snap?(pc>=90?'Atingido':pc>=60?'Parcial':'Não atingido'):(pc>=90?'No caminho':pc>=60?'Atenção':'Em risco');
+  const col=pc>=90?'#639922':pc>=60?'#E8720C':'#CC0000';
+  return `<div class="card"><div class="ch" style="margin-bottom:6px"><div class="ct"><i class="ti ti-currency-dollar"></i> Receita · ${esc(label)}</div><button class="mini adm" onclick="openMetas()"><i class="ti ti-pencil"></i> Metas</button></div>
+  <div class="big">${brl(rec)}</div><div class="mu">meta: ${brl(meta)}</div>
+  <div class="prog"><i style="width:${Math.min(100,meta>0?Math.round(rec/meta*100):0)}%;background:${col}"></i></div>
+  ${snap?`<div class="mu">${pc}% da meta</div>`:`<div class="mu">Projeção: ${brl(pr)} · ${pc}%</div>`}${meta>0?`<span class="st ${cls}">${tx}</span>`:''}</div>`;
+}
+function rSide(){
+  const mh=S.monthHistory||[],sel=selMonth!=='cur'&&mh[selMonth]?mh[selMonth]:null;
+  let h=`<select class="msel" onchange="pickMonth(this.value)" aria-label="Escolher mês"><option value="cur">Mês atual</option>${mh.map((m,i)=>`<option value="${i}"${sel&&String(selMonth)===String(i)?' selected':''}>${esc(m.label)}</option>`).join('')}</select>`;
+  if(sel){
+    h+=recCard(Number(sel.receita)||0,Number(sel.meta)||0,sel.label,true);
+    h+=`<div class="card"><div class="ct" style="margin-bottom:10px"><i class="ti ti-stack-2"></i> Ações por modalidade</div>${modGrid(snapCounts(sel.counts))}</div>`;
+    const rk=sel.ranking||[];
+    if(rk.length)h+=`<div class="card"><div class="ct" style="margin-bottom:6px"><i class="ti ti-trophy"></i> Ranking do mês</div>${rk.filter(r=>PL[r.key]).map((r,i)=>`<div class="wr">${['🥇','🥈','🥉'][i]||'<span class="rn" style="width:22px;display:inline-block">'+(i+1)+'</span>'}${av(r.key,1)}<span style="flex:1">${PL[r.key].n}</span><b class="ip">${num(r.pts)} pts</b></div>`).join('')}</div>`;
+    $('side').innerHTML=h;return;
   }
-  return { uteis, decorridos };
+  const pts=S.points||{},tot=Object.keys(PL).reduce((s,k)=>s+(Number(pts[k])||0),0),mt=Number(S.metas.time)||0,mc=monthCounts();
+  const rec=(S.dailyHistory||[]).reduce((s,d)=>s+Number(d.receita||0),0);
+  h+=`<div class="card"><div class="ch" style="margin-bottom:6px"><div class="ct"><i class="ti ti-target-arrow"></i> Meta do time</div><button class="mini adm" onclick="openMetas()"><i class="ti ti-pencil"></i> Meta</button></div>
+  <div class="big">${num(tot)}</div><div class="mu">${mt>0?'meta: '+num(mt)+' pts na semana':'Meta ainda não definida'}</div>
+  ${mt>0?`<div class="prog"><i style="width:${Math.min(100,Math.round(tot/mt*100))}%;background:#639922"></i></div><div class="mu">${tot>=mt?'Meta batida! 🎉':'Faltam '+num(mt-tot)+' pts'}</div>`:''}</div>`;
+  h+=recCard(rec,Number(S.metas.receita)||0,mname(),false);
+  h+=`<div class="card"><div class="ct" style="margin-bottom:10px"><i class="ti ti-chart-bar"></i> No mês</div><div class="g2" style="margin-bottom:10px"><div class="kc"><span>➕ Upsells</span><b>${mc['25u']||0}</b></div><div class="kc"><span>📈 Upgrades</span><b>${UPG.reduce((s,k)=>s+(mc[k]||0),0)}</b></div></div>${modGrid(mc)}</div>`;
+  $('side').innerHTML=h;
 }
+function pickMonth(v){selMonth=v;rSide();if(v!=='cur')window.scrollTo({top:0,behavior:'smooth'})}
 
-let state = { points:{}, pending:[], validated:0, history:[], weeks:[], denied:[], metas:{upsell:20,upgrade:30,receita:0,vendas:0}, dailyHistory:[] };
-let prevRanking=[], isAdmin=false, editTarget=null, editOp='add', idCounter=Date.now(), denyTarget=null, firstLoad=true;
+/* ---------- abas ---------- */
+const TABS=[['pend','Pendentes'],['hist','Histórico'],['den','Negadas'],['pts','Pontos'],['rec','Receita diária'],['wk','Semanas'],['mo','Meses']];
+function setTab(k){tab=k;rTabs();rPanel()}
+function rTabs(){$('tabs').innerHTML=TABS.map(([k,l])=>`<button class="tab${tab===k?' on':''}" onclick="setTab('${k}')">${l}${k==='pend'&&S.pending.length?`<span class="cnt">${S.pending.length}</span>`:''}</button>`).join('')}
+function linkH(l){const u=safeUrl(l);return u?`<a class="lk" href="${u}" target="_blank" rel="noopener"><i class="ti ti-external-link"></i> link</a>`:'<span class="dt">sem link</span>'}
+function allLinks(){const a=[];S.history.forEach(h=>a.push({l:h.link,k:h.playerKey,w:fdt(h.validatedAt),id:h.id}));S.weeks.forEach(w=>(w.history||[]).forEach(h=>a.push({l:h.link,k:h.playerKey,w:fdt(h.validatedAt),id:h.id})));S.pending.forEach(p=>a.push({l:p.link,k:p.playerKey,w:'pendente',id:p.id}));return a}
+function dupOf(it){const l=(it.link||'').trim();if(!l)return null;return allLinks().find(x=>(x.l||'').trim()===l&&x.id!==it.id)||null}
+function rPanel(){
+  let h='';
+  if(tab==='pend'){
+    h=S.pending.length?S.pending.map(it=>{
+      if(!PL[it.playerKey])return '';
+      const d=admin?dupOf(it):null;
+      return `<div class="it${d?' dupr':''}">${av(it.playerKey,1)}<div class="grow"><b style="font-weight:500">${PL[it.playerKey].n}</b><small>${emo(it)} ${esc(lbl(it))}</small></div>${d?`<span class="dup"><i class="ti ti-alert-triangle"></i> Duplicado · ${PL[d.k]?PL[d.k].n:''}</span>`:''}${linkH(it.link)}<span class="ip">+${ptsOf(it.pts)} pts</span>
+      <button class="mini gr adm" onclick="validate('${esc(it.id)}')"><i class="ti ti-check"></i> Validar</button><button class="mini rd adm" onclick="openDeny('${esc(it.id)}')"><i class="ti ti-x"></i> Negar</button><button class="mini adm" onclick="delPending('${esc(it.id)}')" aria-label="Excluir"><i class="ti ti-trash"></i></button>${admin?'':'<span class="dt">aguardando validação</span>'}</div>`}).join(''):'<div class="empty"><i class="ti ti-checks" style="font-size:24px;display:block;margin-bottom:6px"></i>Nenhuma ação pendente.</div>';
+  }
+  if(tab==='hist'){
+    const items=S.history.filter(x=>hFilter==='all'||x.playerKey===hFilter);
+    h=`<div class="pills"><button class="pill${hFilter==='all'?' on':''}" onclick="setF('all')">Todos</button>${Object.keys(PL).map(k=>`<button class="pill${hFilter===k?' on':''}" onclick="setF('${k}')">${PL[k].n.split(' ')[0]}</button>`).join('')}</div>`+
+    (items.length?items.map(x=>PL[x.playerKey]?`<div class="it">${av(x.playerKey,1)}<div class="grow"><b style="font-weight:500">${PL[x.playerKey].n}</b><small>${emo(x)} ${esc(lbl(x))}</small></div>${linkH(x.link)}<span class="ip">+${hpts(x)} pts</span><span class="dt">${fdt(x.validatedAt)}</span><button class="mini adm" onclick="delHist('${esc(x.id)}')" aria-label="Excluir e estornar"><i class="ti ti-trash"></i></button></div>`:'').join(''):'<div class="empty">Nenhuma ação encontrada.</div>');
+  }
+  if(tab==='den'){
+    h=S.denied.length?S.denied.map(x=>PL[x.playerKey]?`<div class="it">${av(x.playerKey,1)}<div class="grow"><b style="font-weight:500">${PL[x.playerKey].n}</b><small>${emo(x)} ${esc(lbl(x))}</small>${x.reason?`<small class="why">Motivo: ${esc(x.reason)}</small>`:''}</div>${linkH(x.link)}<span class="dt">${fdt(x.deniedAt)}</span></div>`:'').join(''):'<div class="empty">Nenhuma ação negada.</div>';
+  }
+  if(tab==='pts'){
+    h=`<div class="lg">${Object.keys(ACT).map(k=>`<div class="li${ACT[k].tier?' t'+ACT[k].tier:''}"><span class="le">${ACT[k].e}</span><div class="lt"><b>${ACT[k].s}</b><span>${ACT[k].d}</span></div><div class="lp"><div class="ln">${ACT[k].p}</div><small>pts</small></div></div>`).join('')}</div>`;
+  }
+  if(tab==='rec'){
+    const d=(S.dailyHistory||[]).slice().sort((a,b)=>b.date.localeCompare(a.date)),mx=Math.max(...d.map(x=>Number(x.receita)||0),1);
+    h=`<div style="padding:12px 0 4px"><button class="mini adm" onclick="openDay()"><i class="ti ti-plus"></i> Registrar dia</button></div>`+(d.length?d.map(x=>`<div class="dr"><span class="mu">${new Date(x.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</span><div class="bar"><i style="width:${Math.round((Number(x.receita)||0)/mx*100)}%;background:#0268CD"></i></div><b class="ip" style="text-align:right">${brl(x.receita)}</b><button class="mini adm" onclick="delDay('${esc(x.date)}')" aria-label="Remover dia"><i class="ti ti-trash"></i></button></div>`).join(''):'<div class="empty">Nenhum dia registrado ainda.</div>');
+  }
+  if(tab==='wk'){
+    h=S.weeks.length?S.weeks.map(w=>{
+      const p=w.points||{},o=order(p),c=o[0],d=w.closedAt?new Date(w.closedAt).toLocaleDateString('pt-BR'):'';
+      return `<details><summary><div><b>${esc(w.label||'Semana encerrada')}</b><div class="mu">🏆 ${PL[c].n} · ${w.validated||0} ações · ${d}</div></div><i class="ti ti-chevron-down"></i></summary><div class="champ"><span style="font-size:20px">🏆</span>${av(c,1)}<div><b>${PL[c].n}</b><br><span>${num(p[c])} pts · campeão(ã) da semana</span></div></div>${o.map((k,i)=>`<div class="wr"><span style="width:24px;text-align:center">${['🥇','🥈','🥉'][i]||i+1}</span>${av(k,1)}<span style="flex:1">${PL[k].n}</span><b class="ip">${num(p[k])} pts</b></div>`).join('')}<div style="height:8px"></div></details>`}).join(''):'<div class="empty">Nenhuma semana encerrada ainda.</div>';
+  }
+  if(tab==='mo'){
+    const m=S.monthHistory||[];
+    h=m.length?m.map((x,i)=>{const r=(x.ranking||[]).filter(q=>PL[q.key])[0];return `<div class="it"><i class="ti ti-calendar-event" style="font-size:20px;color:#7F77DD"></i><div class="grow"><b style="font-weight:500">${esc(x.label)}</b><small>${r?'🏆 '+PL[r.key].n+' · '+num(r.pts)+' pts · ':''}${brl(x.receita)} de ${brl(x.meta)}</small></div><button class="mini" onclick="viewMonth(${i})"><i class="ti ti-eye"></i> Ver no painel</button></div>`}).join(''):'<div class="empty">Nenhum mês encerrado ainda.</div>';
+  }
+  $('panel').innerHTML=h;
+}
+function setF(k){hFilter=k;rPanel()}
+function viewMonth(i){selMonth=String(i);rSide();window.scrollTo({top:0,behavior:'smooth'})}
 
-function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
-function showOvertake(msg) { const t=document.getElementById('overtakeToast'); t.innerHTML='🔺 '+msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),4000); }
+/* ---------- modais ---------- */
+function modal(title,sub,body,ok,fn,cls){
+  $('mt').textContent=title;$('ms').innerHTML=sub||'';$('mb').innerHTML=body;
+  const b=$('mok');b.innerHTML=ok;b.className='bt '+(cls||'pri');
+  b.onclick=async()=>{b.disabled=true;try{const r=await fn();if(r!==false)closeM()}catch(e){toast(e.message||'Erro.')}b.disabled=false};
+  $('mo').classList.add('open');
+  const f=$('mb').querySelector('input,select,textarea');if(f)setTimeout(()=>f.focus(),30);
+  $('mb').querySelectorAll('input').forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter')b.click()}));
+}
+function closeM(){$('mo').classList.remove('open')}
+$('mo').addEventListener('click',e=>{if(e.target===$('mo'))closeM()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+const done=async(msg)=>{toast(msg);await load()};
 
-function detectOvertakes(newSorted) {
-  if (firstLoad||!prevRanking.length) return;
-  newSorted.forEach(([key,p],newPos)=>{
-    const oldPos=prevRanking.indexOf(key);
-    if (oldPos>newPos&&oldPos!==-1) showOvertake(`${p.name} ultrapassou ${playersMeta[prevRanking[newPos]]?.name||''}! 🔥`);
+function lockClick(){
+  if(admin){admin=false;document.body.classList.remove('admin');$('locki').className='ti ti-lock';$('lockt').textContent='Gestor';renderAll();toast('Modo gestor desativado');return}
+  modal('Modo gestor','Digite a senha para validar ações e editar o painel.','<input type="password" id="pw" placeholder="Senha" autocomplete="off" />','Entrar',()=>{
+    if($('pw').value!==ADMIN_PASS){toast('Senha incorreta.');return false}
+    admin=true;document.body.classList.add('admin');$('locki').className='ti ti-lock-open';$('lockt').textContent='Gestor ativo';renderAll();toast('Modo gestor ativo');
+  });
+}
+function openReg(){
+  modal('Registrar ação','A ação fica pendente até o gestor validar.',
+  `<label>Participante</label><select id="rp"><option value="">Selecione...</option>${Object.keys(PL).map(k=>`<option value="${k}">${PL[k].n} (${esc(PL[k].a)})</option>`).join('')}</select>
+   <label>Tipo de ação</label><select id="ra"><option value="">Selecione...</option>${Object.keys(ACT).map(k=>`<option value="${k}">${ACT[k].e} ${ACT[k].l} — ${ACT[k].p} pts</option>`).join('')}</select>
+   <label>Link da intranet</label><input type="text" id="rl" placeholder="Cole o link aqui" /><div id="rw"></div>`,
+  'Enviar para validação',async()=>{
+    const k=$('rp').value,a=$('ra').value,l=$('rl').value.trim();
+    if(!k||!a){toast('Selecione participante e tipo de ação.');return false}
+    if(!l){toast('Cole o link da intranet.');return false}
+    await api('add-pending',{id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),playerKey:k,pts:a,label:ACT[a].l,link:l,at:new Date().toISOString()});
+    await done('Ação enviada! Aguarde a validação.');
+  });
+  $('rl').addEventListener('input',()=>{const d=dupOf({link:$('rl').value,id:''});$('rw').innerHTML=d&&$('rl').value.trim().length>8?`<div class="warn"><i class="ti ti-alert-triangle"></i> Esse link já foi registrado por <b>${PL[d.k]?PL[d.k].n:''}</b> (${d.w}).</div>`:''});
+}
+async function validate(id){
+  if(!admin)return;const it=S.pending.find(p=>String(p.id)===String(id));if(!it)return;
+  try{await api('validate',{id:it.id,playerKey:it.playerKey,pts:it.pts,label:lbl(it)});await done('Ação validada!')}
+  catch(e){toast(e.message);await load()}
+}
+function openDeny(id){
+  if(!admin)return;
+  modal('Negar ação','O motivo fica visível para o time na aba Negadas.','<textarea id="dr" rows="3" placeholder="Ex: link inválido ou ação não encontrada no CRM"></textarea>','Confirmar negação',async()=>{
+    const r=$('dr').value.trim();if(!r){toast('Informe o motivo.');return false}
+    try{await api('deny-pending',{id,reason:r})}catch(e){toast(e.message);await load();return}
+    await done('Ação negada.');
+  },'dng');
+}
+async function delPending(id){if(!admin)return;try{await api('delete-pending',{id});await done('Ação excluída.')}catch(e){toast(e.message)}}
+async function delHist(id){if(!admin||!confirm('Excluir esta ação e estornar os pontos?'))return;try{await api('delete-history',{id});await done('Ação removida e pontos estornados.')}catch(e){toast(e.message)}}
+function openEdit(k){
+  if(!admin)return;editK=k;opSel='add';const p=PL[k];
+  modal('Editar pontos','Ajuste manual dos pontos de '+p.n+'. Hoje: <b>'+num(S.points[k])+' pts</b>.',
+  `<div class="ops"><button class="op on" data-o="add">+ Adicionar</button><button class="op" data-o="remove">− Remover</button><button class="op" data-o="set">= Definir</button></div><input type="number" id="ev" min="0" placeholder="Quantidade de pontos" />`,'Salvar',async()=>{
+    const v=parseInt($('ev').value);if(isNaN(v)||v<0){toast('Informe um valor válido.');return false}
+    await api('edit-points',{playerKey:editK,op:opSel,value:v});await done('Pontos atualizados!');
+  });
+  $('mb').querySelectorAll('.op').forEach(b=>b.onclick=()=>{opSel=b.dataset.o;$('mb').querySelectorAll('.op').forEach(x=>x.classList.toggle('on',x===b))});
+}
+function openZero(){if(!admin)return;modal('Zerar registros de hoje','Remove do histórico e estorna os pontos de todas as ações validadas hoje. Não dá para desfazer.','','Zerar hoje',async()=>{await api('zero-today',{});await done('Registros de hoje removidos!')},'dng')}
+function openWeek(){if(!admin)return;modal('Encerrar semana','Salva o ranking e o histórico da semana e zera pontos, pendentes e negadas.','<input type="text" id="wl" placeholder="Nome da semana (ex.: Semana 1 · 02/06 a 06/06)" />','Encerrar e zerar',async()=>{const l=$('wl').value.trim();if(!l){toast('Digite o nome da semana.');return false}await api('close-week',{label:l});await done('Semana encerrada!')},'dng')}
+function openMonth(){
+  if(!admin)return;
+  modal('Encerrar mês','Salva ranking, modalidades e receita do mês e <b>zera pontos, histórico, pendentes e receita diária</b>. Não dá para desfazer.',`<input type="text" id="ml" value="${esc(mname())}" />`,'Encerrar mês',async()=>{
+    const l=$('ml').value.trim();if(!l){toast('Digite o nome do mês.');return false}
+    const rk=Object.keys(PL).map(k=>({key:k,pts:Number(S.points[k])||0})).sort((a,b)=>b.pts-a.pts);
+    await api('close-month',{label:l,counts:monthCounts(),receita:(S.dailyHistory||[]).reduce((s,d)=>s+Number(d.receita||0),0),meta:Number(S.metas.receita)||0,ranking:rk,closedAt:new Date().toISOString()});
+    selMonth='cur';await done('Mês encerrado e zerado!');
+  },'dng');
+}
+function openMetas(){
+  if(!admin)return;
+  modal('Metas','Defina as metas usadas nos indicadores.',`<label>Meta de receita do mês (R$)</label><input type="number" id="mr" min="0" value="${Number(S.metas.receita)||0}" /><label>Meta de pontos do time na semana</label><input type="number" id="mt2" min="0" value="${Number(S.metas.time)||0}" />`,'Salvar metas',async()=>{
+    await api('update-metas',{metas:{receita:parseFloat($('mr').value)||0,time:parseInt($('mt2').value)||0}});await done('Metas salvas!');
+  });
+}
+function openDay(){
+  if(!admin)return;
+  modal('Registrar resultado do dia','Informe a data e a receita do dia.',`<input type="date" id="dd" value="${new Date().toISOString().slice(0,10)}" /><input type="number" id="dv" min="0" placeholder="Receita do dia (R$)" />`,'Salvar',async()=>{
+    const d=$('dd').value;if(!d){toast('Informe a data.');return false}
+    await api('add-daily',{date:d,receita:parseFloat($('dv').value)||0});await done('Resultado salvo!');
+  });
+}
+async function delDay(d){if(!admin)return;try{await api('remove-daily',{date:d});await done('Dia removido.')}catch(e){toast(e.message)}}
+function openMotiv(){
+  if(!admin)return;
+  modal('Mensagem para o time','Aparece no topo do painel para todo mundo.',`<textarea id="mv" rows="3">${esc($('motiv').textContent)}</textarea>`,'Publicar',async()=>{
+    const t=$('mv').value.trim();if(!t){toast('Digite uma mensagem.');return false}
+    await api('update-motiv',{text:t});$('motiv').textContent=t;toast('Mensagem publicada!');
   });
 }
 
-async function loadData(showRefresh=false) {
-  const icon=document.getElementById('refreshIcon');
-  if (showRefresh) icon.classList.add('spinning');
-  try {
-    const res=await fetch('/api/get-data'); if(!res.ok) throw new Error();
-    const newState=await res.json();
-    const pts=newState.points||{};
-    const newSorted=Object.entries(playersMeta).sort((a,b)=>(pts[b[0]]||0)-(pts[a[0]]||0));
-    detectOvertakes(newSorted);
-    prevRanking=newSorted.map(([k])=>k);
-    state={...state,...newState};
-    if (newState.motiv) document.getElementById('motivationalText').textContent = newState.motiv;
-  } catch(e){console.error(e);}
-  if (showRefresh){icon.classList.remove('spinning');showToast('Dados atualizados!');}
-  populateMonthSelector();
-  renderRanking(); renderPending(); renderHistory(); renderDenied(); renderWeeks(); updateStats(); renderKPIs(); renderDailyHistory(); renderModalidades();
-  firstLoad=false;
+/* ---------- contador ---------- */
+function tick(){
+  const n=new Date();let d=(5-n.getDay()+7)%7;const t=new Date(n);t.setDate(n.getDate()+d);t.setHours(18,0,0,0);if(t<=n)t.setDate(t.getDate()+7);
+  const s=Math.floor((t-n)/1000),dd=Math.floor(s/86400),hh=Math.floor(s%86400/3600),mm=Math.floor(s%3600/60),ss=s%60,el=$('cd');
+  el.textContent=dd>0?`${dd}d ${hh}h ${mm}m`:hh>0?`${hh}h ${mm}m ${ss}s`:`${mm}m ${ss}s`;
+  el.className=(t-n)<86400000?'urg':'';
 }
-
-async function saveData(action,payload) {
-  const res=await fetch('/api/save-data',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,payload})});
-  if(!res.ok) throw new Error('Erro ao salvar');
-  return res.json();
-}
-
-function tryAdmin() {
-  const val=document.getElementById('adminPwInput').value;
-  const status=document.getElementById('adminStatus');
-  if (val===ADMIN_PASS) {
-    isAdmin=true; document.getElementById('pageWrap').classList.add('admin-mode');
-    status.innerHTML='<div class="admin-status ok"><i class="ti ti-shield-check"></i> Modo admin ativo</div>';
-    document.getElementById('adminPwInput').value='';
-    // show add day btn in right sidebar header
-    document.querySelectorAll('.add-day-btn').forEach(b=>b.style.display='block');
-    renderRanking(); renderPending(); renderHistory();
-  } else {
-    status.innerHTML='<div class="admin-status err"><i class="ti ti-x"></i> Senha incorreta</div>';
-    setTimeout(()=>{if(status.querySelector('.err'))status.innerHTML='';},2000);
-  }
-}
-
-function rankIcon(pos) {
-  if(pos===1) return '<span style="font-size:18px">🥇</span>';
-  if(pos===2) return '<span style="font-size:18px">🥈</span>';
-  if(pos===3) return '<span style="font-size:18px">🥉</span>';
-  return `<span class="rank-n">${pos}</span>`;
-}
-
-function renderRanking() {
-  const pts=state.points||{};
-  const history=state.history||[];
-  const sorted=Object.entries(playersMeta).sort((a,b)=>(pts[b[0]]||0)-(pts[a[0]]||0));
-  const maxPts=Math.max(...Object.values(pts).map(Number),1);
-  document.getElementById('rankingCard').innerHTML=sorted.map(([key,p],i)=>{
-    const barPct=Math.round(((pts[key]||0)/maxPts)*100);
-    const title=calcTitle(key,history);
-    return `<div class="ranking-row" id="row-${key}">
-      <div style="text-align:center">${rankIcon(i+1)}</div>
-      <div class="player-cell"><div class="avatar ${p.cls}">${p.av}</div>
-        <div><div class="player-name">${p.name}</div><div class="player-alias">${p.alias}</div>${title?`<span class="player-title">${title}</span>`:''}</div>
-      </div>
-      <div class="bar-wrap"><div class="bar-bg"><div class="bar-fill ${p.bar}" style="width:${barPct}%"></div></div></div>
-      <div class="points-cell"><div><div class="points-big">${pts[key]||0}</div><div class="points-label">pts</div></div>
-        <button class="edit-pts-btn" onclick="openEditModal('${key}')"><i class="ti ti-pencil"></i></button></div>
-    </div>`;
-  }).join('');
-  const leader=sorted[0];
-  document.getElementById('statLeader').textContent=leader[1].name.split(' ')[0];
-  document.getElementById('statLeaderPts').textContent=(pts[leader[0]]||0)>0?`${pts[leader[0]]} pts`:'empatados';
-}
-
-function renderPending() {
-  const pending=state.pending||[];
-  const list=document.getElementById('pendingList');
-  if (!pending.length){list.innerHTML='<div class="empty-state"><i class="ti ti-checks" style="font-size:20px;display:block;margin-bottom:4px"></i>Nenhuma ação pendente.</div>';return;}
-  list.innerHTML=pending.map(item=>{
-    const p=playersMeta[item.playerKey]; if(!p) return '';
-    const linkHtml=item.link?`<a href="${item.link}" target="_blank" rel="noopener" style="font-size:10px;color:#0268CD;text-decoration:none;white-space:nowrap;margin-right:3px;"><i class="ti ti-external-link" style="font-size:11px"></i> link</a>`:'';
-    const dupCheck = item.link ? (state.history||[]).find(h=>h.link&&h.link.trim()===item.link.trim()) || (state.pending||[]).find(pp=>pp.id!==item.id&&pp.link&&pp.link.trim()===item.link.trim()) : null;
-    const dupBadge = dupCheck ? `<span class="dup-badge"><i class="ti ti-alert-triangle" style="font-size:10px"></i> Duplicado</span>` : '';
-    return `<div class="pending-item ${dupCheck?'dup-item':''}" id="pend-${item.id}">
-      <div class="pending-avatar ${p.cls}">${p.av}</div>
-      <div class="pending-name">${p.name} <span class="pending-action">— ${getLabel(item.pts)}</span></div>
-      ${dupBadge}${linkHtml}
-      <span class="pending-pts">+${getPoints(item.pts)} pts</span>
-      <button class="action-btn green" onclick="validate('${item.id}','${item.playerKey}','${item.pts}')"><i class="ti ti-check"></i> Validar</button>
-      <button class="action-btn red" onclick="openDenyModal('${item.id}')"><i class="ti ti-x"></i> Negar</button>
-      <button class="action-btn gray" onclick="deletePending('${item.id}')"><i class="ti ti-trash"></i></button>
-    </div>`;
-  }).join('');
-}
-
-function renderHistory() {
-  const history = (state.history || []).filter(h => historyFilter === 'all' || h.playerKey === historyFilter);
-  const list = document.getElementById('historyList');
-  if (!history.length){list.innerHTML='<div class="empty-state">Nenhuma ação encontrada.</div>';return;}
-  list.innerHTML=history.map(item=>{
-    const p=playersMeta[item.playerKey]; if(!p) return '';
-    const linkHtml=item.link?`<a href="${item.link}" target="_blank" rel="noopener" class="history-link"><i class="ti ti-external-link"></i> link</a>`:'';
-    const resolvedPts=item.resolvedPts||getPoints(item.pts);
-    return `<div class="history-item">
-      <div class="history-avatar ${p.cls}">${p.av}</div>
-      <div class="history-name-wrap"><div style="font-size:12px;font-weight:500">${p.name}</div><div class="history-action">${getLabel(item.pts)}</div></div>
-      ${linkHtml}
-      <span class="history-pts">+${resolvedPts} pts</span>
-      <span class="history-date-lbl">${fmtDate(item.validatedAt)}</span>
-      <button class="action-btn gray" onclick="deleteHistory('${item.id}')" style="margin-left:2px"><i class="ti ti-trash"></i></button>
-    </div>`;
-  }).join('');
-}
-
-function renderDenied() {
-  const denied=state.denied||[];
-  const list=document.getElementById('deniedList');
-  if (!denied.length){list.innerHTML='<div class="empty-state">Nenhuma ação negada.</div>';return;}
-  list.innerHTML=denied.map(item=>{
-    const p=playersMeta[item.playerKey]; if(!p) return '';
-    const linkHtml=item.link?`<a href="${item.link}" target="_blank" rel="noopener" class="history-link"><i class="ti ti-external-link"></i> link</a>`:'';
-    return `<div class="denied-item">
-      <div class="denied-avatar ${p.cls}">${p.av}</div>
-      <div class="denied-name"><div style="font-size:12px;font-weight:500">${p.name}</div><div class="denied-action">${getLabel(item.pts)}</div>${item.reason?`<div class="denied-reason">❌ ${item.reason}</div>`:''}</div>
-      ${linkHtml}
-      <span class="denied-pts" style="color:#CC0000">−${getPoints(item.pts)} pts</span>
-      <span class="history-date-lbl">${fmtDate(item.deniedAt)}</span>
-    </div>`;
-  }).join('');
-}
-
-function renderWeeks() {
-  const weeks=state.weeks||[];
-  const container=document.getElementById('weeksList');
-  if (!weeks.length){container.innerHTML='<div class="empty-state">Nenhuma semana encerrada ainda.</div>';return;}
-  container.innerHTML=weeks.map((week,wi)=>{
-    const pts=week.points||{};
-    const sorted=Object.entries(playersMeta).sort((a,b)=>(pts[b[0]]||0)-(pts[a[0]]||0));
-    const date=week.closedAt?new Date(week.closedAt).toLocaleDateString('pt-BR'):'';
-    const champion=sorted[0];
-    const championPts=pts[champion[0]]||0;
-    const championHtml=`<div class="week-champion">
-      <span class="week-champion-crown">🏆</span>
-      <div class="avatar ${champion[1].cls}" style="width:28px;height:28px;font-size:10px">${champion[1].av}</div>
-      <div>
-        <div class="week-champion-name">${champion[1].name}</div>
-        <div class="week-champion-pts">${championPts} pts · campeão da semana</div>
-      </div>
-    </div>`;
-    const rows=sorted.map(([key,p],i)=>`
-      <div class="week-ranking-row">
-        <span style="font-size:16px;width:24px;text-align:center">${rankIcon(i+1)}</span>
-        <div class="avatar ${p.cls}" style="width:26px;height:26px;font-size:9px">${p.av}</div>
-        <div style="font-size:12px;font-weight:500">${p.name}</div>
-        <span class="week-pts">${pts[key]||0} pts</span>
-      </div>`).join('');
-    return `<div class="week-card">
-      <div class="week-header" onclick="toggleWeek(${wi})">
-        <div>
-          <div class="week-label">${week.label||'Semana encerrada'}</div>
-          <div class="week-meta">🏆 ${champion[1].name} · ${week.validated||0} ações · ${date}</div>
-        </div>
-        <i class="ti ti-chevron-down" id="weekChevron${wi}"></i>
-      </div>
-      <div class="week-body" id="weekBody${wi}">${championHtml}${rows}</div>
-    </div>`;
-  }).join('');
-}
-
-// KPIs — left sidebar
-function renderKPIs() {
-  const sel = document.getElementById('monthSelector');
-  const selVal = sel ? sel.value : 'current';
-
-  // Mês anterior selecionado
-  if (selVal !== 'current') {
-    const monthSnap = (state.monthHistory||[])[parseInt(selVal)];
-    if (monthSnap) {
-      const pctR = monthSnap.meta > 0 ? Math.min(Math.round((monthSnap.receita/monthSnap.meta)*100),150) : 0;
-      function barColor(p){if(p>=90)return'#639922';if(p>=60)return'#E8720C';return'#CC0000';}
-      function badge(p){if(p>=90)return'<span class="kpi-badge ok">Atingido</span>';if(p>=60)return'<span class="kpi-badge warn">Parcial</span>';return'<span class="kpi-badge risk">Não atingido</span>';}
-      document.getElementById('kpiList').innerHTML = `
-        <div class="kpi-item"><div class="kpi-label">Receita do mês</div>
-          <div class="kpi-row"><div class="kpi-value">${fmtBRL(monthSnap.receita)}</div><div class="kpi-meta">meta: ${fmtBRL(monthSnap.meta)}</div></div>
-          <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:${Math.min(pctR,100)}%;background:${barColor(pctR)}"></div></div>
-          <div class="kpi-footer"><span>${pctR}%</span></div>${monthSnap.meta>0?badge(pctR):''}
-        </div>`;
-      // modalidades do mês histórico
-      const counts = monthSnap.counts || {};
-      const items = [
-        {key:'60',label:'🔄 Recuperação',cls:'mv-tier1'},{key:'50',label:'⚡ Reativação',cls:'mv-tier2'},
-        {key:'40i',label:'🤝 Indicação',cls:'mv-tier2'},{key:'40',label:'⏫ Upg. duração',cls:'mv-tier2'},
-        {key:'30ts',label:'⏫ Tri→Sem',cls:'mv-normal'},{key:'30sa',label:'⏫ Sem→An',cls:'mv-normal'},
-        {key:'30',label:'📈 Upgrade plano',cls:'mv-normal'},{key:'25u',label:'➕ Upsell',cls:'mv-normal'},
-        {key:'30r',label:'🛡️ Retenção',cls:'mv-normal'},{key:'10a',label:'📅 Antecipação',cls:'mv-normal'},
-        {key:'20k',label:'💎 Plano +3k',cls:'mv-normal'},{key:'40k',label:'💎 Plano +6k',cls:'mv-tier2'},
-      ];
-      document.getElementById('modalidadesList').innerHTML = `<div class="modal-grid">${items.map(i=>`<div class="modal-cell"><div class="modal-cell-label">${i.label}</div><div class="modal-cell-value ${i.cls}">${counts[i.key]||0}</div></div>`).join('')}</div>`;
-
-      // Ranking do mês
-      const ranking = monthSnap.ranking || [];
-      if (ranking.length) {
-        const rankHtml = ranking.map((r,i)=>{
-          const p = playersMeta[r.key]; if(!p) return '';
-          const icons = ['🥇','🥈','🥉'];
-          return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border)">
-            <span style="font-size:16px;width:22px;text-align:center">${icons[i]||i+1}</span>
-            <div class="avatar ${p.cls}" style="width:26px;height:26px;font-size:9px">${p.av}</div>
-            <div style="font-size:12px;font-weight:500;flex:1">${p.name}</div>
-            <span style="font-family:'Outfit',sans-serif;font-size:14px;font-weight:700">${r.pts} pts</span>
-          </div>`;
-        }).join('');
-        const existingRank = document.getElementById('monthRankingEl');
-        if (existingRank) existingRank.remove();
-        const rankCard = document.createElement('div');
-        rankCard.id = 'monthRankingEl';
-        rankCard.style.cssText = 'background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:10px 14px;margin-top:10px';
-        rankCard.innerHTML = `<div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">🏆 Ranking do mês</div>${rankHtml}`;
-        document.getElementById('modalidadesList').after(rankCard);
-      }
-      return;
-    }
-  }
-
-  // Limpar ranking de mês anterior se voltou para atual
-  const existingRankEl = document.getElementById('monthRankingEl');
-  if (existingRankEl) existingRankEl.remove();
-
-  const history = state.history || [];
-  const weeks = state.weeks || [];
-  const metas = state.metas || { receita: 0 };
-
-  // Acumula histórico do mês atual: semana atual + semanas anteriores do mesmo mês
-  const now = new Date();
-  const mesAtual = now.getMonth();
-  const anoAtual = now.getFullYear();
-
-  function isMesAtual(iso) {
-    if (!iso) return false;
-    const d = new Date(iso);
-    return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
-  }
-
-  // Semana atual
-  let upsellCount = history.filter(h => KPI_UPSELL_KEYS.includes(String(h.pts))).length;
-  let upgradeCount = history.filter(h => KPI_UPGRADE_KEYS.includes(String(h.pts))).length;
-
-  // Semanas anteriores do mesmo mês
-  weeks.forEach(week => {
-    if (!week.closedAt || !isMesAtual(week.closedAt)) return;
-    (week.history || []).forEach(h => {
-      if (KPI_UPSELL_KEYS.includes(String(h.pts))) upsellCount++;
-      if (KPI_UPGRADE_KEYS.includes(String(h.pts))) upgradeCount++;
-    });
-  });
-
-  // Receita do mês via dailyHistory
-  const daily = state.dailyHistory || [];
-  const totalReceita = daily.reduce((s,d) => s + Number(d.receita||0), 0);
-
-  const { uteis, decorridos } = diasUteisNoMes();
-  const fator = decorridos > 0 ? uteis / decorridos : 1;
-  const projReceita = Math.round(totalReceita * fator);
-  const pctReceita = metas.receita > 0 ? Math.min(Math.round((projReceita / metas.receita) * 100), 150) : 0;
-  function barColor(p) { if(p>=90) return '#639922'; if(p>=60) return '#E8720C'; return '#CC0000'; }
-  function badge(p) {
-    if(p>=90) return '<span class="kpi-badge ok">No caminho</span>';
-    if(p>=60) return '<span class="kpi-badge warn">Atenção</span>';
-    return '<span class="kpi-badge risk">Em risco</span>';
-  }
-
-  const mesNome = now.toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
-
-  document.getElementById('kpiList').innerHTML = `
-    <div class="kpi-item">
-      <div class="kpi-label"><i class="ti ti-plus" style="font-size:13px"></i> Upsells — ${mesNome}</div>
-      <div class="kpi-value" style="font-size:28px">${upsellCount}</div>
-      <div class="kpi-meta" style="margin-top:2px">ações validadas no mês</div>
-    </div>
-    <div class="kpi-item">
-      <div class="kpi-label"><i class="ti ti-trending-up" style="font-size:13px"></i> Upgrades — ${mesNome}</div>
-      <div class="kpi-value" style="font-size:28px">${upgradeCount}</div>
-      <div class="kpi-meta" style="margin-top:2px">ações validadas no mês</div>
-    </div>
-    <div class="kpi-item" style="border-bottom:none;padding-bottom:0;margin-bottom:0">
-      <div class="kpi-receita-card">
-        <div class="kpi-label"><i class="ti ti-currency-dollar" style="font-size:13px"></i> Receita — ${mesNome}</div>
-        <div class="kpi-row">
-          <div class="kpi-value">${fmtBRL(totalReceita)}</div>
-          <div class="kpi-meta">meta: ${fmtBRL(metas.receita||0)}</div>
-        </div>
-        <div class="kpi-bar-bg"><div class="kpi-bar-fill" style="width:${Math.min(pctReceita,100)}%;background:${pctReceita>=90?'#639922':pctReceita>=60?'#E8720C':'#CC0000'}"></div></div>
-        <div class="kpi-footer"><span>Projeção: ${fmtBRL(projReceita)}</span><span>${pctReceita}%</span></div>
-        ${metas.receita > 0 ? badge(pctReceita) : ''}
-      </div>
-    </div>
-  `;
-}
-
-// Daily history — right sidebar
-function renderDailyHistory() {
-  const daily = (state.dailyHistory || []).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const list = document.getElementById('dailyHistoryList');
-  if (!daily.length){ list.innerHTML='<div class="empty-state">Nenhum registro ainda.</div>'; return; }
-  const maxR = Math.max(...daily.map(d=>Number(d.receita||0)),1);
-  list.innerHTML = daily.map((d,i)=>{
-    const dt = new Date(d.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-    const pct = Math.round((Number(d.receita||0)/maxR)*100);
-    return `<div class="history-entry">
-      <div class="history-date">${dt}</div>
-      <div class="history-bar-wrap">
-        <div class="history-bar-bg"><div class="history-bar-fill" style="width:${pct}%"></div></div>
-        ${d.vendas?`<div style="font-size:10px;color:var(--text-faint);margin-top:1px">${d.vendas} vendas</div>`:''}
-      </div>
-      <div class="history-val">${d.receita?fmtBRL(d.receita):'-'}</div>
-      ${isAdmin?`<button class="action-btn gray" style="display:flex;padding:3px 5px" onclick="removeDayEntry(${i})"><i class="ti ti-trash" style="font-size:11px"></i></button>`:''}
-    </div>`;
-  }).join('');
-}
-
-function updateStats() {
-  const pts=state.points||{};
-  document.getElementById('statTotal').textContent=Object.values(pts).reduce((s,v)=>s+Number(v),0);
-  document.getElementById('statActions').textContent=state.validated||0;
-}
-
-async function validate(id,playerKey,pts) {
-  if (!isAdmin) return;
-  const btn=document.querySelector(`#pend-${id} .action-btn.green`);
-  if (btn){btn.disabled=true;btn.innerHTML='<i class="ti ti-loader spinning"></i>';}
-  try { await saveData('validate',{id,playerKey,pts}); showToast('Ação validada!'); await loadData(); }
-  catch(e){showToast('Erro ao validar.');}
-}
-
-function openDenyModal(id) {
-  if (!isAdmin) return;
-  denyTarget=id;
-  document.getElementById('denyReason').value='';
-  document.getElementById('btnConfirmDeny').disabled=false;
-  document.getElementById('btnConfirmDeny').innerHTML='<i class="ti ti-x"></i> Confirmar negação';
-  openModal('denyModal');
-}
-
-async function confirmDeny() {
-  if (!isAdmin||!denyTarget) return;
-  const reason=document.getElementById('denyReason').value.trim();
-  if (!reason){showToast('Informe o motivo.');return;}
-  const btn=document.getElementById('btnConfirmDeny');
-  btn.disabled=true; btn.innerHTML='<i class="ti ti-loader spinning"></i>';
-  try { await saveData('deny-pending',{id:denyTarget,reason}); closeModal('denyModal'); showToast('Ação negada.'); await loadData(); }
-  catch(e){showToast('Erro ao negar.'); btn.disabled=false; btn.innerHTML='<i class="ti ti-x"></i> Confirmar negação';}
-}
-
-async function deletePending(id) {
-  if (!isAdmin) return;
-  try { await saveData('delete-pending',{id}); showToast('Excluído.'); await loadData(); }
-  catch(e){showToast('Erro.');}
-}
-
-async function deleteHistory(id) {
-  if (!isAdmin) return;
-  if (!confirm('Excluir e estornar pontos?')) return;
-  try { await saveData('delete-history',{id}); showToast('Removido e pontos estornados.'); await loadData(); }
-  catch(e){showToast('Erro.');}
-}
-
-// Meta modal
-function openMetaModal() {
-  const metas=state.metas||{};
-  document.getElementById('metaFields').innerHTML = `
-    <label style="font-size:12px;color:var(--text-muted)">Meta de receita do mês (R$)</label>
-    <input type="number" id="metaReceita" value="${metas.receita||0}" min="0" />
-  `;
-}
-
-async function confirmMeta() {
-  const metas = {
-    receita: parseFloat(document.getElementById('metaReceita').value)||0,
-  };
-  try { await saveData('update-metas',{metas}); state.metas=metas; closeModal('metaModal'); showToast('Metas salvas!'); renderKPIs(); }
-  catch(e){showToast('Erro ao salvar metas.');}
-}
-
-// Day entry
-async function confirmDay() {
-  const date=document.getElementById('dayDate').value;
-  const receita=parseFloat(document.getElementById('dayReceita').value)||0;
-  const vendas=parseInt(document.getElementById('dayVendas').value)||0;
-  if (!date){showToast('Informe a data.');return;}
-  const btn=document.getElementById('btnConfirmDay');
-  btn.disabled=true; btn.textContent='Salvando...';
-  try {
-    await saveData('add-daily',{date,receita,vendas});
-    state.dailyHistory = [...(state.dailyHistory||[]).filter(d=>d.date!==date), {date,receita,vendas}];
-    closeModal('dayModal'); showToast('Resultado salvo!'); renderDailyHistory(); renderKPIs();
-  } catch(e){showToast('Erro.');}
-  btn.disabled=false; btn.textContent='Salvar';
-}
-
-async function removeDayEntry(idx) {
-  if (!isAdmin) return;
-  const daily=(state.dailyHistory||[]).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
-  const entry=daily[idx];
-  if (!entry) return;
-  state.dailyHistory=(state.dailyHistory||[]).filter(d=>d.date!==entry.date);
-  try { await saveData('remove-daily',{date:entry.date}); showToast('Removido.'); renderDailyHistory(); renderKPIs(); }
-  catch(e){showToast('Erro.');}
-}
-
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
-  if (id==='metaModal') openMetaModal();
-  if (id==='dayModal') document.getElementById('dayDate').value=new Date().toISOString().slice(0,10);
-}
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-  if (id==='modalOverlay'){document.getElementById('modalPlayer').value='';document.getElementById('modalAction').value='';document.getElementById('modalLink').value='';document.getElementById('btnConfirmAction').disabled=false;document.getElementById('btnConfirmAction').textContent='Enviar para validação';document.getElementById('dupWarning').style.display='none';}
-  if (id==='weekModal'){document.getElementById('weekLabel').value='';document.getElementById('btnConfirmWeek').disabled=false;document.getElementById('btnConfirmWeek').innerHTML='<i class="ti ti-flag"></i> Encerrar e zerar';}
-  if (id==='monthModal'){document.getElementById('monthLabel').value='';}
-  if (id==='zeroDayModal'){document.getElementById('btnConfirmZeroDay').disabled=false;document.getElementById('btnConfirmZeroDay').innerHTML='<i class="ti ti-trash"></i> Zerar hoje';}
-  if (id==='denyModal'){denyTarget=null;}
-  if (id==='editModal'){editTarget=null;editOp='add';document.getElementById('editPtsValue').value='';document.querySelectorAll('.edit-op-btn').forEach(b=>b.classList.remove('selected'));document.getElementById('opAdd').classList.add('selected');document.getElementById('btnConfirmEdit').disabled=false;document.getElementById('btnConfirmEdit').textContent='Salvar';}
-}
-
-async function confirmAction() {
-  const pk=document.getElementById('modalPlayer').value;
-  const pts=document.getElementById('modalAction').value;
-  const link=document.getElementById('modalLink').value.trim();
-  if (!pk||!pts){showToast('Selecione participante e tipo de ação.');return;}
-  if (!link){showToast('Cole o link da intranet.');return;}
-  const btn=document.getElementById('btnConfirmAction');
-  btn.disabled=true; btn.textContent='Enviando...';
-  try { await saveData('add-pending',{id:String(++idCounter),playerKey:pk,pts,link}); closeModal('modalOverlay'); showToast('Ação enviada! Aguarde validação.'); await loadData(); }
-  catch(e){showToast('Erro.'); btn.disabled=false; btn.textContent='Enviar para validação';}
-}
-
-async function confirmZeroDay() {
-  const btn=document.getElementById('btnConfirmZeroDay');
-  btn.disabled=true; btn.innerHTML='<i class="ti ti-loader spinning"></i>';
-  try { await saveData('zero-today',{}); closeModal('zeroDayModal'); showToast('Registros de hoje removidos!'); await loadData(); }
-  catch(e){showToast('Erro.'); btn.disabled=false; btn.innerHTML='<i class="ti ti-trash"></i> Zerar hoje';}
-}
-
-async function confirmCloseWeek() {
-  const label=document.getElementById('weekLabel').value.trim();
-  if (!label){showToast('Digite o nome da semana.');return;}
-  const btn=document.getElementById('btnConfirmWeek');
-  btn.disabled=true; btn.innerHTML='<i class="ti ti-loader spinning"></i>';
-  try { await saveData('close-week',{label}); closeModal('weekModal'); showToast('Semana encerrada!'); await loadData(); }
-  catch(e){showToast('Erro.'); btn.disabled=false; btn.innerHTML='<i class="ti ti-flag"></i> Encerrar e zerar';}
-}
-
-function openEditModal(playerKey) {
-  if (!isAdmin) return;
-  editTarget=playerKey;
-  const p=playersMeta[playerKey];
-  const pts=(state.points||{})[playerKey]||0;
-  document.getElementById('editCurrentPts').textContent=pts;
-  document.getElementById('editPlayerHeader').innerHTML=`<div class="edit-player-avatar ${p.cls}">${p.av}</div><div><div style="font-size:14px;font-weight:500">${p.name}</div><div style="font-size:11px;color:var(--text-muted)">${p.alias}</div></div>`;
-  openModal('editModal');
-}
-
-function selectOp(op) {
-  editOp=op;
-  document.querySelectorAll('.edit-op-btn').forEach(b=>b.classList.remove('selected'));
-  document.getElementById({add:'opAdd',remove:'opRemove',set:'opSet'}[op]).classList.add('selected');
-}
-
-async function confirmEdit() {
-  if (!isAdmin||!editTarget) return;
-  const val=parseInt(document.getElementById('editPtsValue').value);
-  if (isNaN(val)||val<0){showToast('Valor inválido.');return;}
-  const btn=document.getElementById('btnConfirmEdit');
-  btn.disabled=true; btn.textContent='Salvando...';
-  try { await saveData('edit-points',{playerKey:editTarget,op:editOp,value:val}); closeModal('editModal'); showToast('Pontos atualizados!'); await loadData(); }
-  catch(e){showToast('Erro.'); btn.disabled=false; btn.textContent='Salvar';}
-}
-
-function toggleWeek(i) {
-  const body=document.getElementById(`weekBody${i}`);
-  const chevron=document.getElementById(`weekChevron${i}`);
-  body.classList.toggle('open');
-  chevron.style.transform=body.classList.contains('open')?'rotate(180deg)':'';
-}
-
-async function confirmCloseMonth() {
-  const label = document.getElementById('monthLabel').value.trim();
-  if (!label) { showToast('Digite o nome do mês.'); return; }
-  const btn = document.getElementById('btnConfirmMonth');
-  btn.disabled = true; btn.innerHTML = '<i class="ti ti-loader spinning"></i> Salvando...';
-
-  const history = state.history || [];
-  const weeks = state.weeks || [];
-  const metas = state.metas || {};
-  const dailyHistory = state.dailyHistory || [];
-  const now = new Date();
-  const mes = now.getMonth(), ano = now.getFullYear();
-
-  function isMes(iso) {
-    if (!iso) return false;
-    const d = new Date(iso);
-    return d.getMonth()===mes && d.getFullYear()===ano;
-  }
-
-  const counts = {};
-  history.forEach(h => { const k=String(h.pts); counts[k]=(counts[k]||0)+1; });
-  weeks.forEach(w => {
-    if (!w.closedAt || !isMes(w.closedAt)) return;
-    (w.history||[]).forEach(h => { const k=String(h.pts); counts[k]=(counts[k]||0)+1; });
-  });
-  const totalReceita = dailyHistory.reduce((s,d)=>s+Number(d.receita||0),0);
-
-  // Snapshot do ranking atual + semanas do mês
-  const ranking = Object.entries(state.points||{}).map(([key,pts])=>({key,pts})).sort((a,b)=>b.pts-a.pts);
-
-  try {
-    await saveData('close-month', {
-      label, counts, receita: totalReceita, meta: metas.receita||0,
-      ranking, closedAt: now.toISOString()
-    });
-    closeModal('monthModal');
-    showToast('Mês encerrado e zerado!');
-    await loadData();
-  } catch(e) { showToast('Erro ao salvar.'); }
-  btn.disabled = false; btn.innerHTML = '<i class="ti ti-calendar-event"></i> Salvar snapshot';
-}
-
-function populateMonthSelector() {
-  const months = state.monthHistory || [];
-  const sel = document.getElementById('monthSelector');
-  const current = sel.value;
-  sel.innerHTML = '<option value="current">Mês atual</option>';
-  months.forEach((m, i) => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = m.label;
-    sel.appendChild(opt);
-  });
-  sel.value = current && sel.querySelector(`option[value="${current}"]`) ? current : 'current';
-}
-
-['modalOverlay','denyModal','metaModal','dayModal','zeroDayModal','weekModal','monthModal','editModal','motivModal'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeModal(id);});
-});
-
-// Detecção de links duplicados
-function checkDuplicate(link) {
-  const warn = document.getElementById('dupWarning');
-  if (!link || link.length < 10) { warn.style.display='none'; return; }
-  const allLinks = [
-    ...(state.pending||[]).map(p=>({link:p.link, name:playersMeta[p.playerKey]?.name||'', date:'pendente'})),
-    ...(state.history||[]).map(h=>({link:h.link, name:playersMeta[h.playerKey]?.name||'', date:fmtDate(h.validatedAt)})),
-  ];
-  const dup = allLinks.find(a => a.link && a.link.trim() === link.trim());
-  if (dup) {
-    warn.style.display='block';
-    warn.innerHTML=`<i class="ti ti-alert-triangle" style="font-size:12px"></i> Link já registrado por <strong>${dup.name}</strong> (${dup.date})`;
-  } else {
-    warn.style.display='none';
-  }
-}
-
-function isDuplicate(link) {
-  if (!link) return null;
-  const all = [
-    ...(state.pending||[]).map(p=>({link:p.link, name:playersMeta[p.playerKey]?.name||'', when:'pendente'})),
-    ...(state.history||[]).map(h=>({link:h.link, name:playersMeta[h.playerKey]?.name||'', when:fmtDate(h.validatedAt)})),
-  ];
-  return all.find(a => a.link && a.link.trim() === link.trim()) || null;
-}
-
-// Ações por modalidade
-function renderModalidades() {
-  const history = state.history || [];
-  const weeks = state.weeks || [];
-  const now = new Date();
-  const mes = now.getMonth(), ano = now.getFullYear();
-
-  function isMes(iso) {
-    if (!iso) return false;
-    const d = new Date(iso);
-    return d.getMonth()===mes && d.getFullYear()===ano;
-  }
-
-  const counts = {};
-  // semana atual
-  history.forEach(h => { const k=String(h.pts); counts[k]=(counts[k]||0)+1; });
-  // semanas anteriores do mês
-  weeks.forEach(w => {
-    if (!w.closedAt || !isMes(w.closedAt)) return;
-    (w.history||[]).forEach(h => { const k=String(h.pts); counts[k]=(counts[k]||0)+1; });
-  });
-
-  const items = [
-    { key:'60', label:'🔄 Recuperação', cls:'mv-tier1' },
-    { key:'50', label:'⚡ Reativação', cls:'mv-tier2' },
-    { key:'40i', label:'🤝 Indicação', cls:'mv-tier2' },
-    { key:'40', label:'⏫ Upg. duração (men→an)', cls:'mv-tier2' },
-    { key:'30ts', label:'⏫ Upg. dur. (tri→sem)', cls:'mv-normal' },
-    { key:'30sa', label:'⏫ Upg. dur. (sem→an)', cls:'mv-normal' },
-    { key:'30', label:'📈 Upgrade plano', cls:'mv-normal' },
-    { key:'25u', label:'➕ Upsell add-on', cls:'mv-normal' },
-    { key:'30r', label:'🛡️ Retenção', cls:'mv-normal' },
-    { key:'10a', label:'📅 Antecipação', cls:'mv-normal' },
-    { key:'20k', label:'💎 Plano +3k', cls:'mv-normal' },
-    { key:'40k', label:'💎 Plano +6k', cls:'mv-tier2' },
-  ].filter(i => (counts[i.key]||0) > 0 || true);
-
-  const container = document.getElementById('modalidadesList');
-  const cells = items.map(i => `
-    <div class="modal-cell">
-      <div class="modal-cell-label">${i.label}</div>
-      <div class="modal-cell-value ${i.cls}">${counts[i.key]||0}</div>
-    </div>`).join('');
-  container.innerHTML = `<div class="modal-grid">${cells}</div>`;
-}
-
-function toggleSection(sectionId, chevronId) {
-  const section = document.getElementById(sectionId);
-  const btn = document.getElementById(chevronId);
-  const isCollapsed = section.classList.contains('collapsed');
-  if (isCollapsed) {
-    section.classList.remove('collapsed');
-    section.style.maxHeight = '2000px';
-    btn.innerHTML = '<i class="ti ti-chevron-up" style="font-size:12px"></i> Minimizar';
-  } else {
-    section.classList.add('collapsed');
-    section.style.maxHeight = '0';
-    btn.innerHTML = '<i class="ti ti-chevron-down" style="font-size:12px"></i> Expandir';
-  }
-}
-
-let historyFilter = 'all';
-function setFilter(key) {
-  historyFilter = key;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(`filter-${key}`).classList.add('active');
-  renderHistory();
-}
-
-// Countdown até sexta 18h
-function updateCountdown() {
-  const now = new Date();
-  const day = now.getDay();
-  let daysUntilFri = day <= 5 ? 5 - day : 6;
-  if (day === 5 && now.getHours() >= 18) daysUntilFri = 7;
-  const nextFri = new Date(now);
-  nextFri.setDate(now.getDate() + daysUntilFri);
-  nextFri.setHours(18, 0, 0, 0);
-  const diff = nextFri - now;
-  const timer = document.getElementById('countdownTimer');
-  if (diff <= 0) { timer.textContent = 'Semana encerrada!'; return; }
-  const d = Math.floor(diff/86400000);
-  const h = Math.floor((diff%86400000)/3600000);
-  const m = Math.floor((diff%3600000)/60000);
-  const s = Math.floor((diff%60000)/1000);
-  timer.textContent = d > 0 ? `${d}d ${h}h ${m}m` : h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
-  timer.className = 'countdown-timer' + (diff < 86400000 ? ' urgent' : '');
-}
-setInterval(updateCountdown, 1000);
-updateCountdown();
-
-// Mensagem motivacional
-async function confirmMotiv() {
-  const text = document.getElementById('motivText').value.trim();
-  if (!text) { showToast('Digite uma mensagem.'); return; }
-  try {
-    await saveData('update-motiv', { text });
-    document.getElementById('motivationalText').textContent = text;
-    closeModal('motivModal'); showToast('Mensagem publicada!');
-  } catch(e) { showToast('Erro ao salvar.'); }
-}
-
-loadData();
-setInterval(()=>loadData(),30000);
+tick();setInterval(tick,1000);
+load();setInterval(()=>load(),30000);
 </script>
 </body>
 </html>
